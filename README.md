@@ -3,10 +3,22 @@ Summary
 
 This is the repository for keyboard-efigs, the default webOS pluggable shared library for the virtual keyboard.
 
+keyboard-efigs
+==============
+
+This is the pluggable keyboard component based on the original Open webOS keyboard. 
+It is optimized for tablet and phone layouts, and provides support for locales based on the English, French, Italian, German and Spanish languages.
+
+In addition to being the default keyboard for Open webOS, 
+this component provides a full example of how to implement pluggable keyboard components for Open webOS.
+
+The discovery system of Open webOS will detect available pluggable keyboard components and 
+then select the one with the best fit for locale and screen format.
+
 How to Build on Linux
 =====================
 
-This component is in an early development phase and is not yet indivudually buildable.
+This component is in the development phase and is not yet individually buildable.
 
 # Copyright and License Information
 
