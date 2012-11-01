@@ -20,7 +20,6 @@
 
 
 #include "PalmIMEHelpers.h"
-#include "Logging.h"
 #include <sys/times.h>
 #include <unistd.h>
 
@@ -66,7 +65,7 @@ bool PerfMonitor::takeTime(quint64 & sysTime, quint64 & userTime)
 {
 	quint64 persec = sysconf(_SC_CLK_TCK);
 	struct tms	cputimes;
-	if (VERIFY(times(&cputimes) != -1))
+	if (times(&cputimes) != -1)
 	{
 		sysTime = quint64(cputimes.tms_stime) * 1000LLU / persec;
 		userTime = quint64(cputimes.tms_utime) * 1000LLU / persec;

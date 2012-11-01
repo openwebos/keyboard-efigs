@@ -30,7 +30,8 @@
 #include <stdint.h>
 #include <vector>
 
-#include "Logging.h"
+#include <glib.h>
+
 #include "qcolor.h"
 #include "qpoint.h"
 

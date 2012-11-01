@@ -25,7 +25,6 @@
 #include <qpainter.h>
 #include <map>
 #include <vector>
-#include "Logging.h"
 #include "VirtualKeyboard.h"	// for debug options
 
 void initPixmapFragment(QPainter::PixmapFragment & fragment, const QPointF & topLeft, const QRectF & source);
@@ -156,7 +155,7 @@ public:
 			QRect	boundingRect;
 			textSpec.applyFontSettings(font);
 			GlyphRenderer<T>::m_directRenderer.boundingRect(location, textSpec, font, flags, boundingRect);
-			if (GlyphRenderer<T>::m_glyphCache.allocate(boundingRect.size(), ref) && VERIFY(boundingRect.size() == ref.size()))
+			if (GlyphRenderer<T>::m_glyphCache.allocate(boundingRect.size(), ref) && boundingRect.size() == ref.size())
 			{
 				m_painter.setFont(font);
 				QRect		paintRect(ref.topLeft() + location.topLeft() - boundingRect.topLeft(), location.size());
@@ -190,7 +189,7 @@ public:
 	{
 #if VKB_ENABLE_GLYPH_CACHE
 		QRect * ref = GlyphRenderer<T>::m_glyphCache.lookup(textSpec);
-		if (ref && VERIFY(ref->isValid()))
+		if (ref && ref->isValid())
 		{
 			int x = location.left();
 			int y = location.top();

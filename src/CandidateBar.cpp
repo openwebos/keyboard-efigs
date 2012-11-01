@@ -19,10 +19,10 @@
 
 
 #include "CandidateBar.h"
-#include "PalmIMEHelpers.h"
 
-#include "Utils.h"
 #include "qpropertyanimation.h"
+
+#include <IMEDataInterface.h>
 
 CandidateBar::CandidateBar(Mapper_IF& mapper, IMEDataInterface * dataInterface) : QObject(NULL),
 	m_mapper(mapper), m_IMEDataInterface(dataInterface), m_enabled(false), m_traceAllowed(false), m_scrollOffset(0), m_font("Prelude", 24), m_spacing(15), m_traceEntry(false)

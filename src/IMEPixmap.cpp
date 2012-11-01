@@ -20,12 +20,14 @@
 
 
 #include "IMEPixmap.h"
-#include "Settings.h"
-#include "Logging.h"
-#include "Utils.h"
-#include "SingletonTimer.h"
+// TODO (efigs): settings
+//#include "Settings.h"
+// TODO (efigs): singleton timer
+//#include "SingletonTimer.h"
+
 #include "GlyphCache.h"
 
+#include <QDebug>
 #include <QPainter>
 
 #define CACHE_PIXMAP 1
@@ -43,13 +45,16 @@ QPixmap &	IMEPixmap::pixmap()
 			m_pixmap.load(m_name);
 		else if (s_defaultLocation)
 		{
-			std::string path = Settings::LunaSettings()->lunaSystemResourcesPath + '/' + s_defaultLocation + '/' + m_name;
-			m_pixmap.load((Settings::LunaSettings()->lunaSystemResourcesPath + '/' + s_defaultLocation + '/' + m_name).c_str());
+			// TODO (efigs): settings
+//			std::string path = Settings::LunaSettings()->lunaSystemResourcesPath + '/' + s_defaultLocation + '/' + m_name;
+//			m_pixmap.load((Settings::LunaSettings()->lunaSystemResourcesPath + '/' + s_defaultLocation + '/' + m_name).c_str());
 		}
 		else
-			m_pixmap.load((Settings::LunaSettings()->lunaSystemResourcesPath + "/keyboard/" + m_name).c_str());
+			// TODO (efigs): settings
+//			m_pixmap.load((Settings::LunaSettings()->lunaSystemResourcesPath + "/keyboard/" + m_name).c_str());
+
 		if (m_pixmap.isNull())
-			FAILURE(string_printf("IMEPixmap failed to load keyboard asset '%s'", m_name).c_str());
+			qCritical() << "IMEPixmap failed to load keyboard asset" << m_name << Q_FUNC_INFO;
 	}
 	return m_pixmap;
 }
@@ -110,7 +115,7 @@ void NineTileSprites::draw(QPainter & painter, const QRect & location, QPixmap &
 		nineTileDraw(spritePainter, QRect(pos, 0, width, height), pixmap, false, corner);
 		nineTileDraw(spritePainter, QRect(pos, height, width, height), pixmap, true, corner);
 	}
-	if (cache(count) && VERIFY(pos >= 0))
+	if (cache(count) && pos >= 0)
 		painter.drawPixmap(location.left(), location.top(), *m_pixmap, pos, (pressed ? height : 0), width, height);
 	else
 		nineTileDraw(painter, location, pixmap, pressed, corner);	// can't cache: draw directly...
@@ -248,16 +253,17 @@ void PixmapCache::suspendPurge(bool suspend)
 
 void PixmapCache::schedulePurge()
 {
-	if (!m_suspended && m_stock.size() > 0)
-	{
-#if DELAY_PURGE_PIXMAP
-		if (m_purgeTime == 0)
-			g_timeout_add_seconds(1, delayedPurge, NULL);
-		m_purgeTime = SingletonTimer::currentTime() + 1000;
-#else
-		delayedPurge();
-#endif
-	}
+	// TODO (efigs): singleton timer
+//	if (!m_suspended && m_stock.size() > 0)
+//	{
+//#if DELAY_PURGE_PIXMAP
+//		if (m_purgeTime == 0)
+//			g_timeout_add_seconds(1, delayedPurge, NULL);
+//		m_purgeTime = SingletonTimer::currentTime() + 1000;
+//#else
+//		delayedPurge();
+//#endif
+//	}
 }
 
 gboolean PixmapCache::delayedPurge(gpointer)
@@ -267,26 +273,27 @@ gboolean PixmapCache::delayedPurge(gpointer)
 
 gboolean PixmapCache::delayedPurge()
 {
-	if (!m_suspended)
-	{
-		if (SingletonTimer::currentTime() >= m_purgeTime)
-		{
-			if (m_stock.size() > 0)
-			{
-				//g_debug("PixmapCache::delayedPurge: deleting %u images", m_stock.size());
-				for (TCache::iterator iter = m_stock.begin(); iter != m_stock.end(); ++iter)
-				{
-					//g_debug("PixmapCache::delayedPurge: deleting %dx%d", (*iter)->width(), (*iter)->height());
-					delete *iter;
-				}
-				//g_debug("PixmapCache::delayedPurge: deletions complete!");
-				m_stock.clear();
-			}
-			m_purgeTime = 0;
-			return FALSE;
-		}
-		return TRUE;
-	}
-	m_purgeTime = 0;
+	// TODO (efigs): singleton timer
+//	if (!m_suspended)
+//	{
+//		if (SingletonTimer::currentTime() >= m_purgeTime)
+//		{
+//			if (m_stock.size() > 0)
+//			{
+//				//g_debug("PixmapCache::delayedPurge: deleting %u images", m_stock.size());
+//				for (TCache::iterator iter = m_stock.begin(); iter != m_stock.end(); ++iter)
+//				{
+//					//g_debug("PixmapCache::delayedPurge: deleting %dx%d", (*iter)->width(), (*iter)->height());
+//					delete *iter;
+//				}
+//				//g_debug("PixmapCache::delayedPurge: deletions complete!");
+//				m_stock.clear();
+//			}
+//			m_purgeTime = 0;
+//			return FALSE;
+//		}
+//		return TRUE;
+//	}
+//	m_purgeTime = 0;
 	return FALSE;
 }

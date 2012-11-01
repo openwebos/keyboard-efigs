@@ -20,11 +20,12 @@
 #include "TabletKeymap.h"
 
 #include "KeyLocationRecorder.h"
-#include "Localization.h"
-#include "Logging.h"
-#include "QtUtils.h"
-#include "Utils.h"
-#include "VirtualKeyboardPreferences.h"
+// TODO (efigs): localization
+//#include "Localization.h"
+// TODO (efigs): utils
+//#include "Utils.h"
+// TODO (efigs): virtualkeyboardpreferences
+//#include "VirtualKeyboardPreferences.h"
 
 #include <QFile>
 #include <qdebug.h>
@@ -487,7 +488,7 @@ const char * TabletKeymap::getLayoutDefaultLanguage(const char * layoutName)
 
 void TabletKeymap::setRowHeight(int rowIndex, int height)
 {
-	if (VERIFY(rowIndex >= 0 && rowIndex < cKeymapRows))
+	if (rowIndex >= 0 && rowIndex < cKeymapRows)
 		m_rowHeight[rowIndex] = height;
 }
 
@@ -538,11 +539,12 @@ QString TabletKeymap::getLanguageDisplayName(const std::string & languageName, c
 
 void TabletKeymap::keyboardCombosChanged()
 {
-	VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
-	int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), prefs.getKeyboardComboCount());
-	for (int k = 0; k < count; k++)
-		sLanguageChoices_Extended[k] = (UKey) (cKey_KeyboardComboChoice_First + k);
-	sLanguageChoices_Extended[count] = cKey_None;
+	// TODO (efigs): virtualkeyboardpreferences
+//	VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
+//	int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), prefs.getKeyboardComboCount());
+//	for (int k = 0; k < count; k++)
+//		sLanguageChoices_Extended[k] = (UKey) (cKey_KeyboardComboChoice_First + k);
+//	sLanguageChoices_Extended[count] = cKey_None;
 }
 
 inline float fabs(float f) { return f >= 0.f ? f : -f; }
@@ -724,10 +726,11 @@ bool TabletKeymap::setEditorState(const PalmIME::EditorState & editorState)
 		layoutChanged = true;
 	}
 
-	m_localized__Enter		= fromStdUtf8(LOCALIZED("Enter"));
-	m_localized__Tab		= fromStdUtf8(LOCALIZED("Tab"));
-	m_localized__Next		= fromStdUtf8(LOCALIZED("Next"));
-	m_localized__Previous	= fromStdUtf8(LOCALIZED("Prev"));
+	// TODO (efigs): localization
+//	m_localized__Enter		= fromStdUtf8(LOCALIZED("Enter"));
+//	m_localized__Tab		= fromStdUtf8(LOCALIZED("Tab"));
+//	m_localized__Next		= fromStdUtf8(LOCALIZED("Next"));
+//	m_localized__Previous	= fromStdUtf8(LOCALIZED("Prev"));
 
 	return layoutChanged || weightChanged;
 }
@@ -1027,12 +1030,13 @@ bool TabletKeymap::generateKeyboardLayout(const char * fullPath)
         return false;
 	QFile file(fullPath);
 	//QFile keys(QString(fullPath) + ".keys");
-	if (VERIFY(file.open(QIODevice::WriteOnly))/* && VERIFY(keys.open(QIODevice::WriteOnly))*/)
+	if (file.open(QIODevice::WriteOnly)/* && keys.open(QIODevice::WriteOnly)*/)
 	{
 		updateLimits();
         file.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n");
-        file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
-                m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
+	// TODO (efigs): utils
+//        file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
+//                m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
 		file.write("<area conditionValue=\"0\">\n");
 		QRect	r;
 		for (int y = 0; y < cKeymapRows; ++y)
@@ -1067,12 +1071,14 @@ bool TabletKeymap::generateKeyboardLayout(const char * fullPath)
 					default:                                        break;
 					}
 					if (key == Qt::Key_Space) {
-						file.write(string_printf("<key keyLabel=\" \" keyType=\"function\" keyName=\"ET9KEY_SPACE\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
-												 r.left(), r.top(), r.width(), r.height()).c_str());
+						// TODO (efigs): utils
+//						file.write(string_printf("<key keyLabel=\" \" keyType=\"function\" keyName=\"ET9KEY_SPACE\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
+//												 r.left(), r.top(), r.width(), r.height()).c_str());
 					} else {
-						file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
-							  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
-							  r.left(), r.top(), r.width(), r.height()).c_str());
+						// TODO (efigs): utils
+//						file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
+//							  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
+//							  r.left(), r.top(), r.width(), r.height()).c_str());
 					}
 					//QPoint center = r.center();
 					//keys.write(string_printf("%d %d %d\n", key, center.x(), center.y()).c_str());
@@ -1170,10 +1176,11 @@ QString TabletKeymap::getKeyDisplayString(UKey key, bool logging)
 	{
 		if (UKeyIsKeyboardComboKey(key))
 		{
-			int index = key - cKey_KeyboardComboChoice_First;
-			VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
-			if (VERIFY(index >= 0 && index < prefs.getKeyboardComboCount()))
-				return getLanguageDisplayName(prefs.getkeyboardCombo(index).language, LayoutFamily::findLayoutFamily(prefs.getkeyboardCombo(index).layout.c_str(), false));
+			// TODO (efigs): virtualkeyboardpreferences
+//			int index = key - cKey_KeyboardComboChoice_First;
+//			VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
+//			if (VERIFY(index >= 0 && index < prefs.getKeyboardComboCount()))
+//				return getLanguageDisplayName(prefs.getkeyboardCombo(index).language, LayoutFamily::findLayoutFamily(prefs.getkeyboardCombo(index).layout.c_str(), false));
 			return NULL;
 		}
 
@@ -1232,7 +1239,8 @@ QString TabletKeymap::getKeyDisplayString(UKey key, bool logging)
 		case cKey_SwitchToAzerty:						return "AZERTY";
 		case cKey_SwitchToQwertz:						return "QWERTZ";
 		case cKey_StartStopRecording:					return KeyLocationRecorder::instance().isRecording() ? "Stop" : "Rec";
-		case cKey_ToggleSoundFeedback:					return VirtualKeyboardPreferences::instance().getTapSounds() ? "Mute" : "Sound";
+		// TODO (efigs): virtualkeyboardpreferences
+//        case cKey_ToggleSoundFeedback:					return VirtualKeyboardPreferences::instance().getTapSounds() ? "Mute" : "Sound";
 		case cKey_SymbolPicker:							return "Sym";
 		case Qt::Key_Shift:								return logging ? "Shift" : QString();
 		case Qt::Key_AltGr:								return logging ? "AltGr" : QString();

@@ -20,7 +20,6 @@
 
 
 #include "GlyphCache.h"
-#include "Logging.h"
 #include "IMEPixmap.h"
 
 void initPixmapFragment(QPainter::PixmapFragment & fragment, const QPointF & topLeft, const QRectF & source)

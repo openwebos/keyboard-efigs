@@ -21,13 +21,15 @@
 #ifndef CANDIDATEBAR_H
 #define CANDIDATEBAR_H
 
-#include "IMEDataInterface.h"
-
 #include "qrect.h"
 #include "qstringlist.h"
 #include "qfont.h"
 
 #include "PalmIMEHelpers.h"
+
+#include <palmimedefines.h>
+
+class IMEDataInterface;
 
 class CandidateBar : public QObject
 {

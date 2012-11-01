@@ -22,10 +22,12 @@
 
 #include "KeyLocationRecorder.h"
 #include "PalmIMEHelpers.h"
-#include "Settings.h"
-#include "SingletonTimer.h"
-#include "Utils.h"
-#include "VirtualKeyboardPreferences.h"
+// TODO (efigs): singletontimer
+//#include "SingletonTimer.h"
+// TODO (efigs): utils
+//#include "Utils.h"
+// TODO (efigs): virtualkeyboardpreferences
+//#include "VirtualKeyboardPreferences.h"
 
 #include <QDebug>
 #include <QFile>
@@ -41,9 +43,11 @@ namespace Phone_Keyboard {
  * temporary XML filename
  */
 #define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
+// TODO (efigs): singletontimer
+//#define CURRENT_TIME SingletonTimer::currentTime()
+#define CURRENT_TIME 0
 
-#define CURRENT_TIME SingletonTimer::currentTime()
-
+// TODO (efigs): is this needed? it was already commented out when i got here.
 //	#define DOUBLE_TAP_DURATION Settings::LunaSettings()->tapDoubleClickDuration
 #define DOUBLE_TAP_DURATION 500
 
@@ -162,7 +166,7 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 	m_popup_key("popup-key.png"),
 	m_glyphCache(600, 800)
 {
-	if (VERIFY(s_instance == NULL))
+	if (s_instance == NULL)
 		s_instance = this;
 
 	Q_ASSERT(m_IMEDataInterface);
@@ -187,12 +191,13 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 	connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
 
 	// init size
-	VirtualKeyboardPreferences::instance().applyInitSettings(this);
+	// TODO (efigs): virtualkeyboardpreferences
+//	VirtualKeyboardPreferences::instance().applyInitSettings(this);
 }
 
 PhoneKeyboard::~PhoneKeyboard()
 {
-	if (VERIFY(s_instance == this))
+	if (s_instance == this)
 		s_instance = NULL;
 }
 
@@ -258,7 +263,7 @@ void PhoneKeyboard::syncKeymap()
 {
 	if (m_keymap.layoutFamily() != m_generatedKeymapLayout)
 	{
-		if (VERIFY(m_keymap.generateKeyboardLayout(IME_KDB_XML_FILENAME)))
+		if (m_keymap.generateKeyboardLayout(IME_KDB_XML_FILENAME))
 			m_generatedKeymapLayout = m_keymap.layoutFamily();
 		else
 			m_generatedKeymapLayout = NULL;
@@ -279,7 +284,8 @@ void PhoneKeyboard::showSuggestions(bool show)
 		m_candidateBarLayoutOutdated = true;
 		syncKeymap();
 		keyboardLayoutChanged();
-		VirtualKeyboardPreferences::instance().activateCombo();	// for language update...
+		// TODO (efigs): virtualkeyboardpreferences
+//		VirtualKeyboardPreferences::instance().activateCombo();	// for language update...
 	}
 }
 
@@ -327,7 +333,8 @@ bool PhoneKeyboard::getValue(const std::string & name, std::string & outValue)
 {
 	if (name == "height")
 	{
-		outValue = string_printf("%d", m_requestedHeight);
+		// TODO (efigs): utils
+//		outValue = string_printf("%d", m_requestedHeight);
 		return true;
 	}
 	else if (name == "keyboard_layout")
@@ -385,7 +392,7 @@ void PhoneKeyboard::setKeyboardHeight(int height, bool notify)
 	int width = availableSpace.width();
 	int screenHeight = availableSpace.height();
 	height = qBound<int>(50, height, screenHeight - 28);
-	if (VERIFY(height > 0))
+	if (height > 0)
 	{
 		m_keyboardDirty = true;
 
@@ -673,7 +680,8 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
 	else if (UKeyIsKeyboardComboKey(key))
 	{
 		int index = key - cKey_KeyboardComboChoice_First;
-		VirtualKeyboardPreferences::instance().selectKeyboardCombo(index);
+		// TODO (efigs): virtualkeyboardpreferences
+//		VirtualKeyboardPreferences::instance().selectKeyboardCombo(index);
 	}
 	else
 	{
@@ -738,14 +746,15 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
 			showKeymapRegions();
 			triggerRepaint();
 			break;
+		// TODO (efigs): virtualkeyboardpreferences
 		case cKey_SwitchToQwerty:
-			VirtualKeyboardPreferences::instance().selectLayoutCombo("qwerty");
+//			VirtualKeyboardPreferences::instance().selectLayoutCombo("qwerty");
 			break;
 		case cKey_SwitchToAzerty:
-			VirtualKeyboardPreferences::instance().selectLayoutCombo("azerty");
+//			VirtualKeyboardPreferences::instance().selectLayoutCombo("azerty");
 			break;
 		case cKey_SwitchToQwertz:
-			VirtualKeyboardPreferences::instance().selectLayoutCombo("qwertz");
+//			VirtualKeyboardPreferences::instance().selectLayoutCombo("qwertz");
 			break;
 		case cKey_StartStopRecording:
 		{
@@ -758,17 +767,18 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
 			}
 			break;
 		}
+		// TODO (efigs): virtualkeyboardpreferences
 		case cKey_ToggleLanguage:
-			VirtualKeyboardPreferences::instance().selectNextKeyboardCombo();
+//			VirtualKeyboardPreferences::instance().selectNextKeyboardCombo();
 			break;
 		case cKey_CreateDefaultKeyboards:
-			VirtualKeyboardPreferences::instance().createDefaultKeyboards();
+//			VirtualKeyboardPreferences::instance().createDefaultKeyboards();
 			break;
 		case cKey_ClearDefaultKeyboards:
-			VirtualKeyboardPreferences::instance().clearDefaultDeyboards();
+//			VirtualKeyboardPreferences::instance().clearDefaultDeyboards();
 			break;
 		case cKey_ToggleSoundFeedback:
-			VirtualKeyboardPreferences::instance().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+//			VirtualKeyboardPreferences::instance().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
 			break;
 		case Qt::Key_Left:
 			qtkey = Qt::Key_Left; // used to navigate the cursor left
@@ -1566,7 +1576,8 @@ bool PhoneKeyboard::setSymbolKeyDown(bool symbolKeyDown)
 
 void PhoneKeyboard::makeSound(UKey key)
 {
-	if (VirtualKeyboardPreferences::instance().getTapSounds() && key != cKey_None)
+	// TODO (efigs): virtualkeyboardpreferences
+//	if (VirtualKeyboardPreferences::instance().getTapSounds() && key != cKey_None)
 		m_IMEDataInterface->keyDownAudioFeedback(key);
 }
 
@@ -1627,10 +1638,10 @@ bool PhoneKeyboard::idle()
 			m_keymap.setShiftMode(PhoneKeymap::eShiftMode_CapsLock);
 			m_keymap.setSymbolMode(PhoneKeymap::eSymbolMode_Lock);
 		}
-
-		std::string msg = string_printf("PhoneKeyboard pre-render (%dx%d): shift %d, symbol %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapOrAutoCapActive(), stateIndex, y);
-		PerfMonitor perf(msg.c_str());
-		//g_debug("%s", msg.c_str());
+		// TODO (efigs): utils
+//		std::string msg = string_printf("PhoneKeyboard pre-render (%dx%d): shift %d, symbol %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapOrAutoCapActive(), stateIndex, y);
+//		PerfMonitor perf(msg.c_str());
+//		//g_debug("%s", msg.c_str());
 		for (int x = 0; x < PhoneKeymap::cKeymapColumns; ++x)
 		{
 			QPoint	keyCoord(x, y);
