@@ -20,8 +20,42 @@
 
 
 #include "PalmIMEHelpers.h"
+
+#include <cstdio>
 #include <sys/times.h>
 #include <unistd.h>
+
+std::string string_printf(const char *format, ...)
+{
+	if (format == 0)
+		return "";
+	va_list args;
+	va_start(args, format);
+	char stackBuffer[1024];
+	int result = vsnprintf(stackBuffer, G_N_ELEMENTS(stackBuffer), format, args);
+	if (result > -1 && result < (int) G_N_ELEMENTS(stackBuffer))
+	{	// stack buffer was sufficiently large. Common case with no temporary dynamic buffer.
+		va_end(args);
+		return std::string(stackBuffer, result);
+	}
+
+	int length = result > -1 ? result + 1 : G_N_ELEMENTS(stackBuffer) * 3;
+	char * buffer = 0;
+	do
+	{
+		if (buffer)
+		{
+			delete[] buffer;
+			length *= 3;
+		}
+		buffer = new char[length];
+		result = vsnprintf(buffer, length, format, args);
+	} while (result == -1 && result < length);
+	va_end(args);
+	std::string	str(buffer, result);
+	delete[] buffer;
+	return str;
+}
 
 quint64 currentTime()
 {
@@ -34,6 +68,8 @@ quint64 currentTime()
 
 void PerfMonitor::trace(const char * message, GLogLevelFlags logLevel)
 {
+	(void)message;(void)logLevel;
+
 	quint64 sys_time, user_time;
 	if (takeTime(sys_time, user_time))
 	{

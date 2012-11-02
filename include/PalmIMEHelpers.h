@@ -28,6 +28,7 @@
 #define PALMIMEHELPERS_H
 
 #include <stdint.h>
+#include <string>
 #include <vector>
 
 #include <glib.h>
@@ -35,10 +36,17 @@
 #include "qcolor.h"
 #include "qpoint.h"
 
+#include "PhoneKeyboard.h"
+
+class IMEDataInterface;
+
 struct Mapper_IF
 {
 	virtual std::string		pointToKeys(const QPoint & point) = 0;
 };
+
+// Build an std::string using printf-style formatting
+std::string string_printf(const char *format, ...) G_GNUC_PRINTF(1, 2);
 
 quint64 currentTime();
 

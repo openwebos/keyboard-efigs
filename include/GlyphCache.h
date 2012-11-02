@@ -131,7 +131,7 @@ public:
 		m_glyphCache(glyphCache), m_directRenderer(directRenderer) {}
 
 	virtual void render(const QRect & location, const T & textSpec, QFont & font, int flags = Qt::AlignCenter) = 0;
-	virtual void renderNow(const QRect & location, const T & textSpec, QFont & font, int flags = Qt::AlignCenter)		{} // doesn't always make sense...
+	virtual void renderNow(const QRect & location, const T & textSpec, QFont & font, int flags = Qt::AlignCenter) { (void)location;(void)textSpec;(void)font;(void)flags; } // doesn't always make sense...
 	virtual void flush() {}
 
 protected:

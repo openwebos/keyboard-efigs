@@ -209,10 +209,10 @@ private:
 	std::map<int, Touch>	m_touches;			// where the user touches the screen, only while touching in key-coordinate (0, 0) = Q, (0, 1) = W...
 	bool				m_shiftDown;
 	bool				m_symbolDown;
+	bool				m_resizeMode;
 	uint64_t			m_lastShiftTime;
 	uint64_t			m_lastUnlockTime;
 
-	bool				m_resizeMode;
 	int					m_keyboardTopPading;
 	int					m_requestedHeight;
 	NineTileCorner		m_9tileCorner;
@@ -271,10 +271,10 @@ private:
 	IMEPixmap			m_drag_highlight;
 	IMEPixmap			m_white_key;
 	IMEPixmap			m_gray_key;
+	IMEPixmap			m_short_gray_key;
 	IMEPixmap			m_black_key;
 	IMEPixmap			m_shift_on_key;
 	IMEPixmap			m_shift_lock_key;
-	IMEPixmap			m_short_gray_key;
 
 	// popup assets.
 	IMEPixmap			m_popup;

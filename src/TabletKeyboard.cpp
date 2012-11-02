@@ -21,10 +21,6 @@
 
 #include "KeyLocationRecorder.h"
 #include "PalmIMEHelpers.h"
-// TODO (efigs): singletontimer
-//#include "SingletonTimer.h"
-// TODO (efigs): utils
-//#include "Utils.h"
 // TODO (efigs): virtualkeyboardpreferences
 //#include "VirtualKeyboardPreferences.h"
 
@@ -40,12 +36,8 @@ namespace Tablet_Keyboard {
  */
 #define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
 
-// TODO (efigs): singletontimer
-//#define CURRENT_TIME SingletonTimer::currentTime()
-#define CURRENT_TIME 0
+#define CURRENT_TIME currentTime()
 
-// TODO (efigs): is this needed? it was already commented out when i got here.
-//	#define DOUBLE_TAP_DURATION Settings::LunaSettings()->tapDoubleClickDuration
 #define DOUBLE_TAP_DURATION 500
 
 #define DEBUG_TOUCH 0
@@ -334,6 +326,8 @@ bool TabletKeyboard::setBoolOption(const std::string & optionName, bool value)
 
 bool TabletKeyboard::setIntOption(const std::string & optionName, int value)
 {
+	(void)value;
+
 	g_warning("TabletKeyboard::setIntOption: \"%s\" is not supported.", optionName.c_str());
 	return false;
 }
@@ -342,8 +336,7 @@ bool TabletKeyboard::getValue(const std::string & name, std::string & outValue)
 {
 	if (name == "height")
 	{
-		// TODO (efigs): utils
-//		outValue = string_printf("%d", m_requestedHeight);
+		outValue = string_printf("%d", m_requestedHeight);
 		return true;
 	}
 	else if (name == "keyboard_layout")
@@ -829,7 +822,6 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
 			break;
 		case cKey_StartStopRecording:
 		{
-			bool	wasRecording = KeyLocationRecorder::instance().isRecording();
 			KeyLocationRecorder::instance().startStop(m_keymap.layoutName(), m_keymap.rect());
 			if (KeyLocationRecorder::instance().isRecording())
 			{
@@ -1007,7 +999,7 @@ void TabletKeyboard::touchEvent(const QTouchEvent& te)
 			if (m_touches.size() > 0)
 			{
 				if (m_IMEDataInterface->m_visible.get())
-					g_critical("Clearing %u non-finished touches!", m_touches.size());
+					g_critical("Clearing %u non-finished touches!", (unsigned int)m_touches.size());
 				for (QList<QTouchEvent::TouchPoint>::ConstIterator iter = touchPoints.constBegin(); iter != touchPoints.constEnd(); ++iter)
 					m_candidateBar.endTrace(iter->id());
 				m_touches.clear();
@@ -1696,10 +1688,10 @@ bool TabletKeyboard::idle()
 			m_keymap.setSymbolMode(TabletKeymap::eSymbolMode_Lock);
 			m_keymap.setAutoCap(true);
 		}
-		// TODO (efigs): utils
-//		std::string msg = string_printf("TabletKeyboard pre-render (%dx%d): shift %d, symbol %d, cap %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapActive(), m_keymap.isAutoCapActive(), stateIndex, y);
-//		PerfMonitor perf(msg.c_str());
-//		//g_debug("%s", msg.c_str());
+
+		std::string msg = string_printf("TabletKeyboard pre-render (%dx%d): shift %d, symbol %d, cap %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapActive(), m_keymap.isAutoCapActive(), stateIndex, y);
+		PerfMonitor perf(msg.c_str());
+		//g_debug("%s", msg.c_str());
 		for (int x = 0; x < TabletKeymap::cKeymapColumns; ++x)
 		{
 			QPoint	keyCoord(x, y);

@@ -126,8 +126,8 @@ private:
 	bool	cache(int count)					{ return count <= 2; }
 
 	TSprites	m_sprites;
-	QSize		m_size;
 	QPixmap *	m_pixmap;
+	QSize		m_size;
 };
 
 class PixmapCache

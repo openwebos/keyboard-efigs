@@ -115,6 +115,9 @@ Q_SIGNALS:
 
 public:
 	virtual ~IMEDataInterface() {}
+
+	//! Gets value of \a key from system settings (luna.conf)
+	virtual QVariant getLunaSystemSetting(const QString &key) = 0;
 };
 
 #endif // IMEDATAINTERFACE_H

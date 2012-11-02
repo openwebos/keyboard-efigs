@@ -130,6 +130,8 @@ public:
 	// For debug purposes, to implement luna-send command on an existing instance
 	static PhoneKeyboard * getExistingInstance()	{ return s_instance; }
 
+	IMEDataInterface *dataInterface() { return m_IMEDataInterface; }
+
 	void	requestSize(int size);								// not supported on phone
 	void	requestHeight(int height);							// temporary, not persisted. Reset by rotation & restart.
 	void	changePresetHeightForSize(int size, int height);	// change preset size of orientation. 0 is portrait, 1 is landscape.

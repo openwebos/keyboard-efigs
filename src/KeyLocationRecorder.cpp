@@ -26,8 +26,7 @@
 
 #include <time.h>
 #include <QString>
-// TODO (efigs): utils
-//#include "Utils.h"
+#include "PalmIMEHelpers.h"
 #include <sys/stat.h>
 
 #if defined(TARGET_DEVICE)
@@ -62,13 +61,12 @@ void KeyLocationRecorder::startStop(const char * layoutName, const QRect & keyma
 		struct tm times;
 		time_t now = ::time(0);
 		::localtime_r(&now, &times);
-		// TODO (efigs): utils
-//		std::string name = string_printf("%s/keyLocationRecordings/keys%02d-%02d_%02dh%02dm%02ds.txt", PATH_PREFIX,
-//										 times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec);
-//		mkdir(string_printf("%s/keyLocationRecordings", PATH_PREFIX).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-//		m_file = fopen(name.c_str(), "w");
-//		keyboardSizeChanged(layoutName, keymapRect);
-//		msg = "Virtual Keyboard Recording Started!";
+		std::string name = string_printf("%s/keyLocationRecordings/keys%02d-%02d_%02dh%02dm%02ds.txt", PATH_PREFIX,
+										 times.tm_mon + 1, times.tm_mday, times.tm_hour, times.tm_min, times.tm_sec);
+		mkdir(string_printf("%s/keyLocationRecordings", PATH_PREFIX).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		m_file = fopen(name.c_str(), "w");
+		keyboardSizeChanged(layoutName, keymapRect);
+		msg = "Virtual Keyboard Recording Started!";
 	}
 	if (!m_lastMessageID.empty())
 	{

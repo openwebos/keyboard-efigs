@@ -19,13 +19,10 @@
 
 #include "PhoneKeymap.h"
 
-#include "PhoneKeymap.h"
-
 #include "KeyLocationRecorder.h"
 // TODO (efigs): localization
 //#include "Localization.h"
-// TODO (efigs): utils
-//#include "Utils.h"
+#include "PalmIMEHelpers.h"
 // TODO (efigs): virtualkeyboardpreferences
 //#include "VirtualKeyboardPreferences.h"
 
@@ -798,6 +795,8 @@ QPoint PhoneKeymap::pointToKeyboard(const QPoint & location)
 
 std::string PhoneKeymap::pointToKeys(const QPoint & point)
 {
+	(void)point;
+
 	return "";
 }
 
@@ -810,9 +809,8 @@ bool PhoneKeymap::generateKeyboardLayout(const char * fullPath)
 	{
 		updateLimits();
 		file.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n");
-		// TODO (efigs): utils
-//		file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
-//				m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
+		file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
+				m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
 		file.write("<area conditionValue=\"0\">\n");
 		QRect	r;
 		for (int y = 0; y < cKeymapRows; ++y)
@@ -834,10 +832,9 @@ bool PhoneKeymap::generateKeyboardLayout(const char * fullPath)
 					//case Qt::Key_Apostrophe:    text = "&apos;";    break;
 					default:                                        break;
 					}
-					// TODO (efigs): utils
-//					file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
-//						  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
-//						  r.left(), r.top(), r.width(), r.height()).c_str());
+					file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
+						  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
+						  r.left(), r.top(), r.width(), r.height()).c_str());
 				}
 			}
 		file.write("</area>\n\n");

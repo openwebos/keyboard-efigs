@@ -22,10 +22,6 @@
 
 #include "KeyLocationRecorder.h"
 #include "PalmIMEHelpers.h"
-// TODO (efigs): singletontimer
-//#include "SingletonTimer.h"
-// TODO (efigs): utils
-//#include "Utils.h"
 // TODO (efigs): virtualkeyboardpreferences
 //#include "VirtualKeyboardPreferences.h"
 
@@ -43,18 +39,17 @@ namespace Phone_Keyboard {
  * temporary XML filename
  */
 #define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
-// TODO (efigs): singletontimer
-//#define CURRENT_TIME SingletonTimer::currentTime()
-#define CURRENT_TIME 0
 
-// TODO (efigs): is this needed? it was already commented out when i got here.
-//	#define DOUBLE_TAP_DURATION Settings::LunaSettings()->tapDoubleClickDuration
+#define CURRENT_TIME currentTime()
+
 #define DOUBLE_TAP_DURATION 500
 
 #define DEBUG_TOUCH 0
 
 inline bool KeyCap_TwoVertical(const QPoint & keyCoord, UKey key)
 {
+	(void)keyCoord;
+
 	return !UKeyIsFunctionKey(key) && (key < Qt::Key_A || key > Qt::Key_Z);
 }
 
@@ -325,6 +320,8 @@ bool PhoneKeyboard::setBoolOption(const std::string & optionName, bool value)
 
 bool PhoneKeyboard::setIntOption(const std::string & optionName, int value)
 {
+	(void)value;
+
 	g_warning("PhoneKeyboard::setIntOption: \"%s\" is not supported.", optionName.c_str());
 	return false;
 }
@@ -333,8 +330,7 @@ bool PhoneKeyboard::getValue(const std::string & name, std::string & outValue)
 {
 	if (name == "height")
 	{
-		// TODO (efigs): utils
-//		outValue = string_printf("%d", m_requestedHeight);
+		outValue = string_printf("%d", m_requestedHeight);
 		return true;
 	}
 	else if (name == "keyboard_layout")
@@ -352,6 +348,8 @@ bool PhoneKeyboard::getValue(const std::string & name, std::string & outValue)
 
 void PhoneKeyboard::requestSize(int size)
 {
+	(void)size;
+
 	requestHeight(m_presetHeight[inLandscapeOrientation()]);
 }
 
@@ -373,6 +371,8 @@ void PhoneKeyboard::changePresetHeightForSize(int size, int height)
 
 void PhoneKeyboard::availableSpaceChanged(const QRect & size)
 {
+	(void)size;
+
 	m_candidateBar.commit();
 	m_extendedKeys = NULL;
 	m_keymap.setRect(0, 0, 0, 0);
@@ -758,7 +758,6 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
 			break;
 		case cKey_StartStopRecording:
 		{
-			bool	wasRecording = KeyLocationRecorder::instance().isRecording();
 			KeyLocationRecorder::instance().startStop(m_keymap.layoutName(), m_keymap.rect());
 			if (KeyLocationRecorder::instance().isRecording())
 			{
@@ -923,7 +922,7 @@ void PhoneKeyboard::touchEvent(const QTouchEvent& te)
 			if (m_touches.size() > 0)
 			{
 				if (m_IMEDataInterface->m_visible.get())
-					g_critical("Clearing %u non-finished touches!", m_touches.size());
+					g_critical("Clearing %u non-finished touches!", (unsigned int)m_touches.size());
 				for (QList<QTouchEvent::TouchPoint>::ConstIterator iter = touchPoints.constBegin(); iter != touchPoints.constEnd(); ++iter)
 					m_candidateBar.endTrace(iter->id());
 				m_touches.clear();
@@ -1310,6 +1309,8 @@ bool PhoneKeyboard::updateBackground()
 
 QPixmap & PhoneKeyboard::getKeyBackground(const QPoint & keyCoord, UKey key)
 {
+	(void)key;
+
 	/*
 	if (key == Qt::Key_Shift)
 	{
@@ -1638,10 +1639,10 @@ bool PhoneKeyboard::idle()
 			m_keymap.setShiftMode(PhoneKeymap::eShiftMode_CapsLock);
 			m_keymap.setSymbolMode(PhoneKeymap::eSymbolMode_Lock);
 		}
-		// TODO (efigs): utils
-//		std::string msg = string_printf("PhoneKeyboard pre-render (%dx%d): shift %d, symbol %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapOrAutoCapActive(), stateIndex, y);
-//		PerfMonitor perf(msg.c_str());
-//		//g_debug("%s", msg.c_str());
+
+		std::string msg = string_printf("PhoneKeyboard pre-render (%dx%d): shift %d, symbol %d, autoCap %d, index=%d, y=%d", m_keymap.rect().width(), m_keymap.rect().height(), m_keymap.isShiftActive(), m_keymap.isSymbolActive(), m_keymap.isCapOrAutoCapActive(), stateIndex, y);
+		PerfMonitor perf(msg.c_str());
+		//g_debug("%s", msg.c_str());
 		for (int x = 0; x < PhoneKeymap::cKeymapColumns; ++x)
 		{
 			QPoint	keyCoord(x, y);

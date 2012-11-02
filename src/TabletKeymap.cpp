@@ -22,8 +22,7 @@
 #include "KeyLocationRecorder.h"
 // TODO (efigs): localization
 //#include "Localization.h"
-// TODO (efigs): utils
-//#include "Utils.h"
+#include "PalmIMEHelpers.h"
 // TODO (efigs): virtualkeyboardpreferences
 //#include "VirtualKeyboardPreferences.h"
 
@@ -1034,9 +1033,8 @@ bool TabletKeymap::generateKeyboardLayout(const char * fullPath)
 	{
 		updateLimits();
         file.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n\n");
-	// TODO (efigs): utils
-//        file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
-//                m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
+        file.write(string_printf("<keyboard primaryId=\"0x%02X\" secondaryId=\"0x%02X\" defaultLayoutWidth=\"%d\" defaultLayoutHeight=\"%d\">\n\n",
+                m_layoutFamily->m_primaryID, m_layoutFamily->m_secondaryID >> 8, rect().width(), rect().height()).c_str());
 		file.write("<area conditionValue=\"0\">\n");
 		QRect	r;
 		for (int y = 0; y < cKeymapRows; ++y)
@@ -1071,14 +1069,12 @@ bool TabletKeymap::generateKeyboardLayout(const char * fullPath)
 					default:                                        break;
 					}
 					if (key == Qt::Key_Space) {
-						// TODO (efigs): utils
-//						file.write(string_printf("<key keyLabel=\" \" keyType=\"function\" keyName=\"ET9KEY_SPACE\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
-//												 r.left(), r.top(), r.width(), r.height()).c_str());
+						file.write(string_printf("<key keyLabel=\" \" keyType=\"function\" keyName=\"ET9KEY_SPACE\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
+												 r.left(), r.top(), r.width(), r.height()).c_str());
 					} else {
-						// TODO (efigs): utils
-//						file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
-//							  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
-//							  r.left(), r.top(), r.width(), r.height()).c_str());
+						file.write(string_printf("<key keyLabel=\"%s\" keyType=\"%s\" keyLeft=\"%ddp\" keyTop=\"%ddp\" keyWidth=\"%ddp\" keyHeight=\"%ddp\" />\n",
+							  text.toUtf8().data(), key < 256 && isalpha(key) ? "regional" : "nonRegional",
+							  r.left(), r.top(), r.width(), r.height()).c_str());
 					}
 					//QPoint center = r.center();
 					//keys.write(string_printf("%d %d %d\n", key, center.x(), center.y()).c_str());
