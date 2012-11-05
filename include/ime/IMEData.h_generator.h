@@ -20,22 +20,22 @@
 
 
 /*
-	This file is to be pre-processed by the C preprocessor *before* being handled by gcc (preprocessor + compiler)
+    This file is to be pre-processed by the C preprocessor *before* being handled by gcc (preprocessor + compiler)
 
-	This is a work around for Qt no supporting templates nor macros when defining QObject classes.
+    This is a work around for Qt no supporting templates nor macros when defining QObject classes.
 
-	You can edit this file, but follow these rules:
+    You can edit this file, but follow these rules:
 
-	- do no add includes to this file. It will be processed (that is, "preprocessed" by cpp, the C preprocessor), then processed by qmake, then by gcc (cpp + compiler),
-	  and you only want the first preprocessor pass to unroll the macros defined & used in this file. Use the INCLUDE and INCLUDE_SYSTEM macros to generate includes performed in the next pre-processing pass.
-	  The file generated will be processed by:
-	  - qmake, to generate Qt's moc files.
-	  - gcc (that is, cpp and the C++ compiler)
-	- do not make edit to the output of this file: the next time this file is processed, the generated file will be overwriten...
+    - do no add includes to this file. It will be processed (that is, "preprocessed" by cpp, the C preprocessor), then processed by qmake, then by gcc (cpp + compiler),
+      and you only want the first preprocessor pass to unroll the macros defined & used in this file. Use the INCLUDE and INCLUDE_SYSTEM macros to generate includes performed in the next pre-processing pass.
+      The file generated will be processed by:
+      - qmake, to generate Qt's moc files.
+      - gcc (that is, cpp and the C++ compiler)
+    - do not make edit to the output of this file: the next time this file is processed, the generated file will be overwriten...
 
-	Qt does not allow the use of templates (the otherwise "right" way to do what we are trying to do here), or macros to generate classes that derive from QObject.
-	To generate the file, from the top of the sysmgr project folder, do
-		cpp -P -o Src/ime/IMEData.h Src/ime/IMEData.h_generator.h
+    Qt does not allow the use of templates (the otherwise "right" way to do what we are trying to do here), or macros to generate classes that derive from QObject.
+    To generate the file, from the top of the sysmgr project folder, do
+        cpp -P -o Src/ime/IMEData.h Src/ime/IMEData.h_generator.h
  */
 
 // Header includes must be all done in the generated header for qmake to work
@@ -46,50 +46,50 @@
 
 // Base implementation macro of template class. Don't use directly. Prefer the macros that follow...
 #define IMEDATA_TYPE_NAME_FULLINIT(TYPE,NAME,FULLINIT,SET) \
-	class IMEData_##NAME : public QObject \
-	{\
-		Q_OBJECT \
-	\
-	public:\
-		IMEData_##NAME() FULLINIT {}\
-		const TYPE &	get() const { return m_value; }\
-		void			set(const TYPE & value)\
-		{\
-			SET\
-		}\
-	\
-	Q_SIGNALS:\
-		void valueChanged(const TYPE & newValue);\
-	\
-	private:\
-		TYPE	m_value;\
-	};
+    class IMEData_##NAME : public QObject \
+    {\
+        Q_OBJECT \
+    \
+    public:\
+        IMEData_##NAME() FULLINIT {}\
+        const TYPE & get() const { return m_value; }\
+        void   set(const TYPE & value)\
+        {\
+            SET\
+        }\
+    \
+    Q_SIGNALS:\
+        void valueChanged(const TYPE & newValue);\
+    \
+    private:\
+        TYPE m_value;\
+    };
 
-#define SIGNAL_IF_CHANGED_SET		if (!(value == m_value)) { m_value = value; Q_EMIT valueChanged(value); }
-#define SIGNAL_ALWAYS_SET			m_value = value; Q_EMIT valueChanged(value);
-
-// Define a TYPE-member, using type's default constructor.
-#define IMEDATA_TYPE(TYPE)							IMEDATA_TYPE_NAME_FULLINIT(TYPE, TYPE, /* NO INIT */, SIGNAL_IF_CHANGED_SET)
+#define SIGNAL_IF_CHANGED_SET   if (!(value == m_value)) { m_value = value; Q_EMIT valueChanged(value); }
+#define SIGNAL_ALWAYS_SET       m_value = value; Q_EMIT valueChanged(value);
 
 // Define a TYPE-member, using type's default constructor.
-#define IMEDATA_TYPE_NAME(TYPE, NAME)				IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME, /* NO INIT */, SIGNAL_IF_CHANGED_SET)
-#define IMEDATA_TYPE_NAME_SIGNAL(TYPE, NAME)		IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME, /* NO INIT */, SIGNAL_ALWAYS_SET)
+#define IMEDATA_TYPE(TYPE)                      IMEDATA_TYPE_NAME_FULLINIT(TYPE, TYPE, /* NO INIT */, SIGNAL_IF_CHANGED_SET)
+
+// Define a TYPE-member, using type's default constructor.
+#define IMEDATA_TYPE_NAME(TYPE, NAME)           IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME, /* NO INIT */, SIGNAL_IF_CHANGED_SET)
+#define IMEDATA_TYPE_NAME_SIGNAL(TYPE, NAME)    IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME, /* NO INIT */, SIGNAL_ALWAYS_SET)
 
 // Define a TYPE-member, with specified init value.
-#define IMEDATA_TYPE_INIT(TYPE,VALUE)				IMEDATA_TYPE_NAME_FULLINIT(TYPE, TYPE,: m_value(VALUE), SIGNAL_IF_CHANGED_SET)
+#define IMEDATA_TYPE_INIT(TYPE,VALUE)           IMEDATA_TYPE_NAME_FULLINIT(TYPE, TYPE,: m_value(VALUE), SIGNAL_IF_CHANGED_SET)
 
 // Define a TYPE-member, naming the class using the NAME token and the specified init value.
 // Use this variant when the type name uses a scoped type.
-#define IMEDATA_TYPE_NAME_INIT(TYPE,NAME,VALUE)		IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME,: m_value(VALUE), SIGNAL_IF_CHANGED_SET)
+#define IMEDATA_TYPE_NAME_INIT(TYPE,NAME,VALUE) IMEDATA_TYPE_NAME_FULLINIT(TYPE, NAME,: m_value(VALUE), SIGNAL_IF_CHANGED_SET)
 
 
 // ********************************************************************************************************************************
-//	File generation starts here. All the above will disappear in the processed file, but allows us to do the following declarations
+// File generation starts here. All the above will disappear in the processed file, but allows us to do the following declarations
 // ********************************************************************************************************************************
 
 /*
-	Part 0: include guards and generate something to tell readers that the file was auto-generated by this very file.
-			Note: I haven't found a way to generate a real comment, so I'm using a dummy define to tell the story.
+    Part 0: include guards and generate something to tell readers that the file was auto-generated by this very file.
+            Note: I haven't found a way to generate a real comment, so I'm using a dummy define to tell the story.
 */
 
 MACRO(ifndef) IMEDATA_H
@@ -98,7 +98,7 @@ MACRO(define) IMEDATA_H
 MACRO(define) COMMENT : THIS FILE IS AUTO GENERATED BY __FILE__! DO NOT EDIT!
 
 /*
-	Part 1: generate the needed include statements
+    Part 1: generate the needed include statements
 */
 
 MACRO(include) <QRect>
@@ -111,7 +111,7 @@ MACRO(include) <QString>
 MACRO(include) <palmimedefines.h>
 
 /*
-	Part 2: define the data types
+    Part 2: define the data types
 */
 
 // Define IMEData_QSize
@@ -136,7 +136,7 @@ IMEDATA_TYPE(QString)
 IMEDATA_TYPE_NAME_SIGNAL(PalmIME::EditorState, EditorState)
 
 /*
-	Epilogue: close the include guards
+    Epilogue: close the include guards
 */
 
 MACRO(endif)

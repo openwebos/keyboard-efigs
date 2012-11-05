@@ -36,13 +36,13 @@ extern const char * STANDARD_JSON_SUCCESS;
   */
 
 // Build a standard reply as a const char * string consistently
-#define STANDARD_JSON_SUCCESS 						"{\"returnValue\":true}"
-#define STANDARD_JSON_ERROR(errorCode, errorText)	"{\"returnValue\":false,\"errorCode\":"STR(errorCode)",\"errorText\":\"" errorText "\"}"
-#define MISSING_PARAMETER_ERROR(name, type)			"{\"returnValue\":false,\"errorCode\":2,\"errorText\":\"Missing '" STR(name) "' " STR(type) " parameter.\"}"
-#define INVALID_PARAMETER_ERROR(name, type)			"{\"returnValue\":false,\"errorCode\":3,\"errorText\":\"Invalid '" STR(name) "' " STR(type) " parameter value.\"}"
+#define STANDARD_JSON_SUCCESS "{\"returnValue\":true}"
+#define STANDARD_JSON_ERROR(errorCode, errorText) "{\"returnValue\":false,\"errorCode\":"STR(errorCode)",\"errorText\":\"" errorText "\"}"
+#define MISSING_PARAMETER_ERROR(name, type) "{\"returnValue\":false,\"errorCode\":2,\"errorText\":\"Missing '" STR(name) "' " STR(type) " parameter.\"}"
+#define INVALID_PARAMETER_ERROR(name, type) "{\"returnValue\":false,\"errorCode\":3,\"errorText\":\"Invalid '" STR(name) "' " STR(type) " parameter value.\"}"
 
 // Test the name of a json parameter to determine if it's a system parameter that we should ignore. Pass a (char *)
-#define IS_SYSTEM_PARAMETER(x)	((x) && *(x) == '$')
+#define IS_SYSTEM_PARAMETER(x) ((x) && *(x) == '$')
 #define SYSTEM_PARAMETERS "\"$activity\":{\"type\":\"object\",\"optional\":true}"
 
 // Build a schema as a const char * string without any execution overhead
@@ -93,17 +93,17 @@ extern const char * STANDARD_JSON_SUCCESS;
 class JsonValue
 {
 public:
-	JsonValue(const pbnjson::JValue & value) : mValue(value) {}
+    JsonValue(const pbnjson::JValue & value) : mValue(value) {}
 
-	pbnjson::JValue &		get()										{ return mValue; }
+    pbnjson::JValue &  get()          { return mValue; }
 
-	bool					get(const char * name, std::string & str)	{ return mValue[name].asString(str) == CONV_OK; }
-	bool					get(const char * name, bool & boolean)		{ return mValue[name].asBool(boolean) == CONV_OK; }
-	template <class T> bool	get(const char * name, T & number)			{ return mValue[name].asNumber<T>(number) == CONV_OK; }
-	pbnjson::JValue			get(const char * name)						{ return mValue[name]; }
+    bool get(const char * name, std::string & str) { return mValue[name].asString(str) == CONV_OK; }
+    bool get(const char * name, bool & boolean) { return mValue[name].asBool(boolean) == CONV_OK; }
+    template <class T> bool get(const char * name, T & number) { return mValue[name].asNumber<T>(number) == CONV_OK; }
+    pbnjson::JValue get(const char * name) { return mValue[name]; }
 
 private:
-	pbnjson::JValue	mValue;
+    pbnjson::JValue mValue;
 };
 
 /*
@@ -112,21 +112,21 @@ private:
 class JsonMessageParser
 {
 public:
-	JsonMessageParser(const char * json, const char * schema) : mJson(json), mSchema(schema) {}
+    JsonMessageParser(const char * json, const char * schema) : mJson(json), mSchema(schema) {}
 
-	bool					parse(const char * callerFunction);
-	pbnjson::JValue			get()										{ return mParser.getDom(); }
+    bool parse(const char * callerFunction);
+    pbnjson::JValue get() { return mParser.getDom(); }
 
-	// convenience functions to get a parameter directly.
-	bool					get(const char * name, std::string & str)	{ return get()[name].asString(str) == CONV_OK; }
-	bool					get(const char * name, bool & boolean)		{ return get()[name].asBool(boolean) == CONV_OK; }
-	template <class T> bool	get(const char * name, T & number)			{ return get()[name].asNumber<T>(number) == CONV_OK; }
-	pbnjson::JValue			get(const char * name)						{ return get()[name]; }
+    // convenience functions to get a parameter directly.
+    bool get(const char * name, std::string & str) { return get()[name].asString(str) == CONV_OK; }
+    bool get(const char * name, bool & boolean) { return get()[name].asBool(boolean) == CONV_OK; }
+    template <class T> bool get(const char * name, T & number) { return get()[name].asNumber<T>(number) == CONV_OK; }
+    pbnjson::JValue get(const char * name) { return get()[name]; }
 
 private:
-	const char *				mJson;
-	pbnjson::JSchemaFragment	mSchema;
-	pbnjson::JDomParser			mParser;
+    const char *mJson;
+    pbnjson::JSchemaFragment mSchema;
+    pbnjson::JDomParser mParser;
 };
 
 

@@ -37,15 +37,15 @@ class ShortcutsHandler
     static const Qt::Key cNoKey = Qt::Key(0);
 public:
     ShortcutsHandler(IMEDataInterface * dataInterface);
-    void    resetEditor(const PalmIME::EditorState & state);
-    void    resetEditor();
-    bool    filterKey(Qt::Key & key);
+    void resetEditor(const PalmIME::EditorState & state);
+    void resetEditor();
+    bool filterKey(Qt::Key & key);
 
 private:
-    IMEDataInterface *  m_IMEDataInterface;
-    bool                m_enableDoubleSpacePeriod;
-    quint64             m_lastSpaceTime;
-    Qt::Key             m_lastKey;
+    IMEDataInterface *m_IMEDataInterface;
+    bool m_enableDoubleSpacePeriod;
+    quint64 m_lastSpaceTime;
+    Qt::Key m_lastKey;
 };
 
 #endif // SHORTCUTSHANDLER_H

@@ -28,31 +28,31 @@ class CandidateBarRemote : public CandidateBar
 {
 
 public:
-	CandidateBarRemote(Mapper_IF& mapper, IMEDataInterface * dataInterface);
+    CandidateBarRemote(Mapper_IF& mapper, IMEDataInterface * dataInterface);
 
-	virtual void	setEnabled(bool enable);
+    virtual void setEnabled(bool enable);
 
-	virtual bool	keyboardTap(QPointF where, Qt::Key car);	// returns true if the touch was "used" and no key should be sent
-	virtual bool	backspace(bool shiftDown);					// returns true if backspace was "used"
+    virtual bool keyboardTap(QPointF where, Qt::Key car); // returns true if the touch was "used" and no key should be sent
+    virtual bool backspace(bool shiftDown);     // returns true if backspace was "used"
 
-	virtual bool	loadKeyboardLayoutFile(const char * fullPath, quint16 primaryID, quint16 secondaryID);
-	virtual void	setLanguage(const std::string & languageName);
-	virtual void	updateKeyboardLayout(const char * layoutName, quint32 page, const QRect & keyboardFrame, bool shiftActive, bool capsLockActive, bool autoCapActive);
-	virtual void	updateSuggestions(bool trace);
-	virtual void	processTrace();
+    virtual bool loadKeyboardLayoutFile(const char * fullPath, quint16 primaryID, quint16 secondaryID);
+    virtual void setLanguage(const std::string & languageName);
+    virtual void updateKeyboardLayout(const char * layoutName, quint32 page, const QRect & keyboardFrame, bool shiftActive, bool capsLockActive, bool autoCapActive);
+    virtual void updateSuggestions(bool trace);
+    virtual void processTrace();
 
-	virtual void	clearCandidates();
+    virtual void clearCandidates();
 
-	virtual void	drawXT9Regions(QPixmap * pixmap, int topPadding);
+    virtual void drawXT9Regions(QPixmap * pixmap, int topPadding);
 
-	bool			handleSmartkeyReply(const char * reply);
+    bool handleSmartkeyReply(const char * reply);
 
 private:
-	bool					m_shift;
-	bool					m_capsLock;
-	bool					m_autoCap;
+    bool m_shift;
+    bool m_capsLock;
+    bool m_autoCap;
 
-	LSHandle *				m_serviceHandle;
+    LSHandle *m_serviceHandle;
 };
 
 #endif // CANDIDATEBARREMOTE_H

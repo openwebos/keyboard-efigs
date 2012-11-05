@@ -28,98 +28,98 @@
 
 /*
 
-	The IMEData classes are the explicit equivalent to the following template class IMEData<T>
-	Unfortunately, qmake doesn't support templates nor macros that define a QObject class.
+    The IMEData classes are the explicit equivalent to the following template class IMEData<T>
+    Unfortunately, qmake doesn't support templates nor macros that define a QObject class.
 
-	Expect the following methods:
+    Expect the following methods:
 
-	const T & get();				// access the last set value
-	void set(const T &);			// change a value, which will trigger the signal...
-	void valueChanged(const T &);	// ... to be fired.
+    const T & get();    // access the last set value
+    void set(const T &);   // change a value, which will trigger the signal...
+    void valueChanged(const T &); // ... to be fired.
 
 */
 
 template <class T> class IMEData : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	IMEData() { }
+    IMEData() { }
 
-	const T &	get() const				{ return m_value; }
-	void		set(const T & value)
-	{
-		if (!(value == m_value))
-		{
-			m_value = value;
-			Q_EMIT valueChanged(value);
-		}
-	}
+    const T & get() const    { return m_value; }
+    void  set(const T & value)
+    {
+        if (!(value == m_value))
+        {
+            m_value = value;
+            Q_EMIT valueChanged(value);
+        }
+    }
 
 Q_SIGNALS:
-	void valueChanged(const T & newValue);
+    void valueChanged(const T & newValue);
 
 private:
-	T	m_value;
+    T m_value;
 };
 #endif
 
 
 class IMEDataInterface : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
 
-	//***************
-	//* Host -> IME *
-	//***************
+    //***************
+    //* Host -> IME *
+    //***************
 
-	IMEData_QSize		m_screenSize;		// Total screen space. Will change when the device is rotated.
-	IMEData_QRect		m_availableSpace;	// Space available for the keyboard, in absolute screen coordinate, within the screen space.
-	IMEData_bool		m_visible;			// Tells whether the keyboard should be shown or hidden.
-	IMEData_EditorState	m_editorState;		// Specifies the type of field currently focused. IME should IGNORE the shiftMode field and only refer to m_shiftMode below!
-	IMEData_bool		m_autoCap;			// Tells that the SmartKey service will auto-capitalize the next charactet, which the keyboard should show.
+    IMEData_QSize m_screenSize;  // Total screen space. Will change when the device is rotated.
+    IMEData_QRect m_availableSpace; // Space available for the keyboard, in absolute screen coordinate, within the screen space.
+    IMEData_bool m_visible;   // Tells whether the keyboard should be shown or hidden.
+    IMEData_EditorState m_editorState;  // Specifies the type of field currently focused. IME should IGNORE the shiftMode field and only refer to m_shiftMode below!
+    IMEData_bool m_autoCap;   // Tells that the SmartKey service will auto-capitalize the next charactet, which the keyboard should show.
 
-	virtual void touchEvent(const QTouchEvent& te) = 0;
-	virtual void tapEvent(const QPoint& tapPt) = 0;
-	virtual void paint(QPainter& painter) = 0;
-	virtual void screenEdgeFlickEvent() = 0;
+    virtual void touchEvent(const QTouchEvent& te) = 0;
+    virtual void tapEvent(const QPoint& tapPt) = 0;
+    virtual void paint(QPainter& painter) = 0;
+    virtual void screenEdgeFlickEvent() = 0;
 
-	//***************
-	//* IME -> Host *
-	//***************
+    //***************
+    //* IME -> Host *
+    //***************
 
-	IMEData_qint32		m_keyboardHeight;	// Height of virtual keyboard's main view, which includes the suggestion picker banner if there's one.
-	IMEData_QRegion		m_hitRegion;		// defines an addition hit region that the IME wants input for.
+    IMEData_qint32 m_keyboardHeight; // Height of virtual keyboard's main view, which includes the suggestion picker banner if there's one.
+    IMEData_QRegion m_hitRegion;  // defines an addition hit region that the IME wants input for.
 
     virtual void sendKeyEvent(QEvent::Type type, Qt::Key key, Qt::KeyboardModifiers modifiers) = 0;
-	virtual void invalidateRect(const QRect& rect) { Q_EMIT signalInvalidateRect(rect); }
+    virtual void invalidateRect(const QRect& rect) { Q_EMIT signalInvalidateRect(rect); }
 
-	virtual void setComposingText(const std::string& text) = 0;
-	virtual void commitComposingText() = 0;
+    virtual void setComposingText(const std::string& text) = 0;
+    virtual void commitComposingText() = 0;
 
-	virtual void commitText(const std::string& text) = 0;
+    virtual void commitText(const std::string& text) = 0;
 
-	virtual void performEditorAction(PalmIME::FieldAction action) = 0;
+    virtual void performEditorAction(PalmIME::FieldAction action) = 0;
 
-	//*****************
-	//* IME -> System *
-	//*****************
-	virtual void requestHide() = 0;
-	virtual bool isUIAnimationActive() = 0;
-	virtual void keyDownAudioFeedback(Qt::Key key) = 0;
+    //*****************
+    //* IME -> System *
+    //*****************
+    virtual void requestHide() = 0;
+    virtual bool isUIAnimationActive() = 0;
+    virtual void keyDownAudioFeedback(Qt::Key key) = 0;
 
 Q_SIGNALS:
     void signalInvalidateRect(const QRect& rect);
 
 public:
-	virtual ~IMEDataInterface() {}
+    virtual ~IMEDataInterface() {}
 
-	//! Gets value of \a key from system settings (luna.conf)
-	virtual QVariant getLunaSystemSetting(const QString &key) = 0;
+    //! Gets value of \a key from system settings (luna.conf)
+    virtual QVariant getLunaSystemSetting(const QString &key) = 0;
 
-	virtual QString getLocalizedString(const std::string& str) = 0;
+    virtual QString getLocalizedString(const std::string& str) = 0;
 };
 
 #endif // IMEDATAINTERFACE_H

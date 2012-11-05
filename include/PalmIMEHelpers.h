@@ -42,7 +42,7 @@ class IMEDataInterface;
 
 struct Mapper_IF
 {
-	virtual std::string		pointToKeys(const QPoint & point) = 0;
+    virtual std::string pointToKeys(const QPoint & point) = 0;
 };
 
 // Build an std::string using printf-style formatting
@@ -50,52 +50,52 @@ std::string string_printf(const char *format, ...) G_GNUC_PRINTF(1, 2);
 
 quint64 currentTime();
 
-inline bool isUnicodeQtKey(Qt::Key key)		{ return key >= ' ' && key < Qt::Key_Escape; }
-inline bool isFunctionKey(Qt::Key key)		{ return key >= Qt::Key_Escape; }
+inline bool isUnicodeQtKey(Qt::Key key)  { return key >= ' ' && key < Qt::Key_Escape; }
+inline bool isFunctionKey(Qt::Key key)  { return key >= Qt::Key_Escape; }
 
 class PerfMonitor
 {
 public:
-	PerfMonitor(const char * text = NULL) : m_text(text), m_sys_timeFirst(0), m_user_timeFirst(0), m_sys_timeLast(0), m_user_timeLast(0)
-	{
-		reset();
-	}
-	void trace(const char * message, GLogLevelFlags logLevel = G_LOG_LEVEL_DEBUG);
+    PerfMonitor(const char * text = NULL) : m_text(text), m_sys_timeFirst(0), m_user_timeFirst(0), m_sys_timeLast(0), m_user_timeLast(0)
+    {
+        reset();
+    }
+    void trace(const char * message, GLogLevelFlags logLevel = G_LOG_LEVEL_DEBUG);
 
-	void reset();
+    void reset();
 
-	~PerfMonitor();
+    ~PerfMonitor();
 private:
-	bool takeTime(quint64 & sysTime, quint64 & userTime);
-	static void traceTime(const char * step, const char * message, GLogLevelFlags logLevel, const quint64 & sysTime, const quint64 & userTime, const quint64 & sysTimeRef, const quint64 & userTimeRef);
+    bool takeTime(quint64 & sysTime, quint64 & userTime);
+    static void traceTime(const char * step, const char * message, GLogLevelFlags logLevel, const quint64 & sysTime, const quint64 & userTime, const quint64 & sysTimeRef, const quint64 & userTimeRef);
 
-	const char *	m_text;
-	quint64			m_sys_timeFirst;
-	quint64			m_user_timeFirst;
-	quint64			m_sys_timeLast;
-	quint64			m_user_timeLast;
+    const char *m_text;
+    quint64 m_sys_timeFirst;
+    quint64 m_user_timeFirst;
+    quint64 m_sys_timeLast;
+    quint64 m_user_timeLast;
 };
 
 class ColorMap
 {
 public:
-	ColorMap() { m_colors.reserve(530); }
-	const QColor &	operator[](quint32 index)
-	{
-		if (m_colors.size() < index + 1)
-		{
-			m_colors.reserve(index + 1);
-			while (m_colors.size() < index + 1)
-			{
-				int k = m_colors.size() + 1;
-				m_colors.push_back(QColor(k * 1297519 % 256, k * 507919 % 256, k * 353527 % 256));
-			}
-		}
-		return m_colors[index];
-	}
+    ColorMap() { m_colors.reserve(530); }
+    const QColor & operator[](quint32 index)
+    {
+        if (m_colors.size() < index + 1)
+        {
+            m_colors.reserve(index + 1);
+            while (m_colors.size() < index + 1)
+            {
+                int k = m_colors.size() + 1;
+                m_colors.push_back(QColor(k * 1297519 % 256, k * 507919 % 256, k * 353527 % 256));
+            }
+        }
+        return m_colors[index];
+    }
 
 private:
-	std::vector<QColor>	m_colors;
+    std::vector<QColor> m_colors;
 };
 
 #endif // PALMIMEHELPERS_H

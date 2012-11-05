@@ -35,16 +35,16 @@ class KeyLocationRecorder
 public:
     KeyLocationRecorder();
 
-	static KeyLocationRecorder & instance();
+    static KeyLocationRecorder & instance();
 
-	bool	isRecording() const		{ return m_file != NULL; }
+    bool isRecording() const { return m_file != NULL; }
 
-	void	startStop(const char * layoutName, const QRect & keymapRect);
-	void	record(const QString & text, const QPoint & where, const QString & altText = QString());
-	void	keyboardSizeChanged(const char * layoutName, const QRect & keymapRect);
+    void startStop(const char * layoutName, const QRect & keymapRect);
+    void record(const QString & text, const QPoint & where, const QString & altText = QString());
+    void keyboardSizeChanged(const char * layoutName, const QRect & keymapRect);
 
-	FILE *		m_file;
-	std::string	m_lastMessageID;
+    FILE *m_file;
+    std::string m_lastMessageID;
 };
 
 #endif // KEYLOCATIONRECORDER_H

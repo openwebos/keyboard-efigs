@@ -24,20 +24,20 @@
 
 void initPixmapFragment(QPainter::PixmapFragment & fragment, const QPointF & topLeft, const QRectF & source)
 {
-	fragment.width = source.width();					fragment.height = source.height();
-	fragment.x = topLeft.x() + fragment.width / 2;		fragment.y = topLeft.y() + fragment.height / 2;
-	fragment.sourceLeft = source.left();				fragment.sourceTop = source.top();
-	fragment.scaleX = 1;								fragment.scaleY = 1;
-	fragment.rotation = 0;								fragment.opacity = 1;
+    fragment.width = source.width();                fragment.height = source.height();
+    fragment.x = topLeft.x() + fragment.width / 2;  fragment.y = topLeft.y() + fragment.height / 2;
+    fragment.sourceLeft = source.left();            fragment.sourceTop = source.top();
+    fragment.scaleX = 1;                            fragment.scaleY = 1;
+    fragment.rotation = 0;                          fragment.opacity = 1;
 }
 
 void initPixmapFragment(QPainter::PixmapFragment & fragment, const QRectF & dest, const QRectF & source)
 {
-	fragment.width = source.width();					fragment.height = source.height();
-	qreal destleft = dest.left();						qreal destright = dest.right();
-	fragment.x = (destright + destleft) / 2;			fragment.scaleX = (destright - destleft) / fragment.width;
-	qreal desttop = dest.top();							qreal destbottom = dest.bottom();
-	fragment.y = (destbottom + desttop) / 2;			fragment.scaleY = (destbottom - desttop) / fragment.height;
-	fragment.sourceLeft = source.left();				fragment.sourceTop = source.top();
-	fragment.rotation = 0;								fragment.opacity = 1;
+    fragment.width = source.width();                fragment.height = source.height();
+    qreal destleft = dest.left();                   qreal destright = dest.right();
+    fragment.x = (destright + destleft) / 2;        fragment.scaleX = (destright - destleft) / fragment.width;
+    qreal desttop = dest.top();                     qreal destbottom = dest.bottom();
+    fragment.y = (destbottom + desttop) / 2;        fragment.scaleY = (destbottom - desttop) / fragment.height;
+    fragment.sourceLeft = source.left();            fragment.sourceTop = source.top();
+    fragment.rotation = 0;                          fragment.opacity = 1;
 }

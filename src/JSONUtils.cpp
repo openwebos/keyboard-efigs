@@ -25,58 +25,58 @@
 
 bool JsonMessageParser::parse(const char * callerFunction)
 {
-	if (!mParser.parse(mJson, mSchema))
-	{
-		const char * errorText = "Could not validate json message against schema";
-		pbnjson::JSchemaFragment	genericSchema(SCHEMA_ANY);
-		if (!mParser.parse(mJson, genericSchema))
-			errorText = "Invalid json message";
-		g_critical("%s: %s '%s'", callerFunction, errorText, mJson);
-		return false;
-	}
-	return true;
+    if (!mParser.parse(mJson, mSchema))
+    {
+        const char * errorText = "Could not validate json message against schema";
+        pbnjson::JSchemaFragment genericSchema(SCHEMA_ANY);
+        if (!mParser.parse(mJson, genericSchema))
+            errorText = "Invalid json message";
+        g_critical("%s: %s '%s'", callerFunction, errorText, mJson);
+        return false;
+    }
+    return true;
 }
 
 pbnjson::JValue createJsonReply(bool returnValue, int errorCode, const char *errorText)
 {
-	pbnjson::JValue reply = pbnjson::Object();
-	reply.put("returnValue", returnValue);
-	if (errorCode)
-		reply.put("errorCode", errorCode);
-	if (errorText)
-		reply.put("errorText", errorText);
-	return reply;
+    pbnjson::JValue reply = pbnjson::Object();
+    reply.put("returnValue", returnValue);
+    if (errorCode)
+        reply.put("errorCode", errorCode);
+    if (errorText)
+        reply.put("errorText", errorText);
+    return reply;
 }
 
 std::string createJsonReplyString(bool returnValue, int errorCode, const char *errorText)
 {
-	std::string	reply;
-	if (returnValue)
-		reply = STANDARD_JSON_SUCCESS;
-	else if (errorCode)
-	{
-		if (errorText)
-			reply = string_printf("{\"returnValue\":false,\"errorCode\":%d,\"errorText\":\"%s\"}", errorCode, errorText);
-		else
-			reply = string_printf("{\"returnValue\":false,\"errorCode\":%d}", errorCode);
-	}
-	else if (errorText)
-		reply = string_printf("{\"returnValue\":false,\"errorText\":\"%s\"}", errorText);
-	else
-		reply = string_printf("{\"returnValue\":false}");
-	return reply;
+    std::string reply;
+    if (returnValue)
+        reply = STANDARD_JSON_SUCCESS;
+    else if (errorCode)
+    {
+        if (errorText)
+            reply = string_printf("{\"returnValue\":false,\"errorCode\":%d,\"errorText\":\"%s\"}", errorCode, errorText);
+        else
+            reply = string_printf("{\"returnValue\":false,\"errorCode\":%d}", errorCode);
+    }
+    else if (errorText)
+        reply = string_printf("{\"returnValue\":false,\"errorText\":\"%s\"}", errorText);
+    else
+        reply = string_printf("{\"returnValue\":false}");
+    return reply;
 }
 
-std::string	jsonToString(pbnjson::JValue & reply, const char * schema)
+std::string jsonToString(pbnjson::JValue & reply, const char * schema)
 {
-	pbnjson::JGenerator serializer(NULL);   // our schema that we will be using does not have any external references
-	std::string serialized;
-	pbnjson::JSchemaFragment responseSchema(schema);
-	if (!serializer.toString(reply, responseSchema, serialized)) {
-		g_critical("serializeJsonReply: failed to generate json reply");
-		return "{\"returnValue\":false,\"errorText\":\"error: Failed to generate a valid json reply...\"}";
-	}
-	return serialized;
+    pbnjson::JGenerator serializer(NULL);   // our schema that we will be using does not have any external references
+    std::string serialized;
+    pbnjson::JSchemaFragment responseSchema(schema);
+    if (!serializer.toString(reply, responseSchema, serialized)) {
+        g_critical("serializeJsonReply: failed to generate json reply");
+        return "{\"returnValue\":false,\"errorText\":\"error: Failed to generate a valid json reply...\"}";
+    }
+    return serialized;
 }
 
 LSMessageJsonParser::LSMessageJsonParser(LSMessage * message, const char * schema)
