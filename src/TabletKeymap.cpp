@@ -459,7 +459,7 @@ const TabletKeymap::LayoutFamily * TabletKeymap::LayoutFamily::findLayoutFamily(
 }
 
 TabletKeymap::TabletKeymap() : m_shiftMode(TabletKeymap::eShiftMode_Off), m_symbolMode(eSymbolMode_Off), m_shiftDown(false), m_symbolDown(false), m_autoCap(false), m_numLock(false),
-	m_layoutFamily(&sQwertyFamily), m_layoutPage(eLayoutPage_plain), m_limitsDirty(true), m_limitsVersion(0)
+	m_layoutFamily(&sQwertyFamily), m_layoutPage(eLayoutPage_plain), m_limitsDirty(true), m_limitsVersion(0), m_dataif(0)
 {
 	for (int r = 0; r < cKeymapRows; ++r)
 		m_rowHeight[r] = 1;
@@ -725,11 +725,12 @@ bool TabletKeymap::setEditorState(const PalmIME::EditorState & editorState)
 		layoutChanged = true;
 	}
 
-	// TODO (efigs): localization
-//	m_localized__Enter		= fromStdUtf8(LOCALIZED("Enter"));
-//	m_localized__Tab		= fromStdUtf8(LOCALIZED("Tab"));
-//	m_localized__Next		= fromStdUtf8(LOCALIZED("Next"));
-//	m_localized__Previous	= fromStdUtf8(LOCALIZED("Prev"));
+	if (m_dataif) {
+		m_localized__Enter    = m_dataif->getLocalizedString("Enter");
+		m_localized__Tab      = m_dataif->getLocalizedString("Tab");
+		m_localized__Next     = m_dataif->getLocalizedString("Next");
+		m_localized__Previous = m_dataif->getLocalizedString("Prev");
+	}
 
 	return layoutChanged || weightChanged;
 }
@@ -1021,6 +1022,11 @@ std::string TabletKeymap::pointToKeys(const QPoint & location)
 		}
 	}
 	return keys.toUtf8().data();	// convert to utf8
+}
+
+void TabletKeymap::setIMEDataInterface(IMEDataInterface *dataif)
+{
+	m_dataif = dataif;
 }
 
 bool TabletKeymap::generateKeyboardLayout(const char * fullPath)

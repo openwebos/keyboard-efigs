@@ -364,7 +364,7 @@ const PhoneKeymap::LayoutFamily * PhoneKeymap::LayoutFamily::findLayoutFamily(co
 }
 
 PhoneKeymap::PhoneKeymap() : m_shiftMode(PhoneKeymap::eShiftMode_Off), m_symbolMode(eSymbolMode_Off), m_shiftDown(false), m_symbolDown(false), m_autoCap(false), m_numLock(false),
-	m_layoutFamily(&sQwertyFamily), m_layoutPage(eLayoutPage_plain), m_limitsDirty(true), m_limitsVersion(0)
+	m_layoutFamily(&sQwertyFamily), m_layoutPage(eLayoutPage_plain), m_limitsDirty(true), m_limitsVersion(0), m_dataif(0)
 {
 	for (int r = 0; r < cKeymapRows; ++r)
 		m_rowHeight[r] = 1;
@@ -613,13 +613,12 @@ bool PhoneKeymap::setEditorState(const PalmIME::EditorState & editorState, bool 
 		layoutChanged = true;
 	}
 
-	if (updateTranslations)
+	if (updateTranslations && m_dataif)
 	{
-		// TODO (efigs): localization
-//		m_localized__Enter		= fromStdUtf8(LOCALIZED("Enter"));
-//		m_localized__Tab		= fromStdUtf8(LOCALIZED("Tab"));
-//		m_localized__Next		= fromStdUtf8(LOCALIZED("Next"));
-//		m_localized__Previous	= fromStdUtf8(LOCALIZED("Prev"));
+		m_localized__Enter    = m_dataif->getLocalizedString("Enter");
+		m_localized__Tab      = m_dataif->getLocalizedString("Tab");
+		m_localized__Next     = m_dataif->getLocalizedString("Next");
+		m_localized__Previous = m_dataif->getLocalizedString("Prev");
 	}
 
 	return layoutChanged || weightChanged;
@@ -798,6 +797,11 @@ std::string PhoneKeymap::pointToKeys(const QPoint & point)
 	(void)point;
 
 	return "";
+}
+
+void PhoneKeymap::setIMEDataInterface(IMEDataInterface *dataif)
+{
+	this->m_dataif = dataif;
 }
 
 bool PhoneKeymap::generateKeyboardLayout(const char * fullPath)

@@ -172,6 +172,8 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
 
 	IMEPixmap::setDefaultLocation("keyboard-tablet");
 
+	m_keymap.setIMEDataInterface(m_IMEDataInterface);
+
 	m_keymap.setRowHeight(0, m_short_gray_key.height() / 2);
 	for (int r = 1; r < TabletKeymap::cKeymapRows; ++r)
 		m_keymap.setRowHeight(r, m_white_key.height() / 2);

@@ -118,6 +118,8 @@ public:
 
 	//! Gets value of \a key from system settings (luna.conf)
 	virtual QVariant getLunaSystemSetting(const QString &key) = 0;
+
+	virtual QString getLocalizedString(const std::string& str) = 0;
 };
 
 #endif // IMEDATAINTERFACE_H

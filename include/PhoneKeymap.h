@@ -29,6 +29,7 @@
 #include <qlist.h>
 
 #include "PalmIMEHelpers.h"
+#include "IMEDataInterface.h"
 
 class QFile;
 
@@ -283,6 +284,8 @@ public:
 
 	int					updateLimits();
 
+	void setIMEDataInterface(IMEDataInterface *dataif);
+
 	// Mapper_IF implementation
 	std::string			pointToKeys(const QPoint & point);
 
@@ -310,6 +313,7 @@ private:
 	QString				m_localized__Tab;
 	QString				m_localized__Next;
 	QString				m_localized__Previous;
+	IMEDataInterface *		m_dataif;
 
 	bool				updateMapping();					// true if layout changed
 	bool				updateSymbolKey();

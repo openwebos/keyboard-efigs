@@ -28,6 +28,7 @@
 #include <qstring.h>
 
 #include "PalmIMEHelpers.h"
+#include "IMEDataInterface.h"
 
 // Whether the keyboard should have resize handles in the top left & right corners
 #define RESIZE_HANDLES 0
@@ -284,6 +285,8 @@ public:
 	// Mapper_IF implementation
 	std::string			pointToKeys(const QPoint & point);
 
+	void setIMEDataInterface(IMEDataInterface *dataif);
+
 private:
 	EShiftMode			m_shiftMode;
 	ESymbolMode			m_symbolMode;
@@ -308,6 +311,8 @@ private:
 	QString				m_localized__Tab;
 	QString				m_localized__Next;
 	QString				m_localized__Previous;
+
+	IMEDataInterface *		m_dataif;
 
 	bool				updateMapping();					// true if layout changed
 	bool				updateLanguageKey(LayoutRow * bottomRow = NULL);

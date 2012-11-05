@@ -168,6 +168,8 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 
 	IMEPixmap::setDefaultLocation("keyboard-phone");
 
+	m_keymap.setIMEDataInterface(m_IMEDataInterface);
+
 	for (int r = 0; r < PhoneKeymap::cKeymapRows; ++r)
 		m_keymap.setRowHeight(r, m_white_key.height() / 2);
 
