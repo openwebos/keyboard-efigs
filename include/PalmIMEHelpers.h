@@ -36,7 +36,7 @@
 #include "qcolor.h"
 #include "qpoint.h"
 
-#include "PhoneKeyboard.h"
+#define SINGLETON_CURRENT_TIME (currentTime())
 
 class IMEDataInterface;
 
@@ -52,6 +52,9 @@ quint64 currentTime();
 
 inline bool isUnicodeQtKey(Qt::Key key)  { return key >= ' ' && key < Qt::Key_Escape; }
 inline bool isFunctionKey(Qt::Key key)  { return key >= Qt::Key_Escape; }
+
+IMEDataInterface *getIMEDataInterface();
+void setIMEDataInterface(IMEDataInterface *iface);
 
 class PerfMonitor
 {

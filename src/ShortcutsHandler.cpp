@@ -22,8 +22,7 @@
 #include "ShortcutsHandler.h"
 #include "PalmIMEHelpers.h"
 #include "qchar.h"
-// TODO (efigs): virtualkeyboardpreferences
-//#include "VirtualKeyboardPreferences.h"
+#include <VirtualKeyboardPreferences.h>
 
 const quint64   cMaxDelay = 1000;
 Qt::Key         cUnknownKey = Qt::Key_A;
@@ -38,8 +37,7 @@ ShortcutsHandler::ShortcutsHandler(IMEDataInterface * dataInterface)
 
 void ShortcutsHandler::resetEditor(const PalmIME::EditorState & state)
 {
-    // TODO (efigs): virtualkeyboardpreferences
-//    m_enableDoubleSpacePeriod = (state.type == PalmIME::FieldType_Text) && VirtualKeyboardPreferences::instance().getSpaces2period();
+    m_enableDoubleSpacePeriod = (state.type == PalmIME::FieldType_Text) && m_IMEDataInterface->virtualKeyboardPreferences().getSpaces2period();
     resetEditor();
 }
 
@@ -56,7 +54,7 @@ bool ShortcutsHandler::filterKey(Qt::Key & key)
         //g_debug("ShortcutsHandler::filterKey: '%s' - 0x%X", QString(key).toUtf8().data(), key);
         if (key == Qt::Key_Space && m_lastSpaceTime)
         {
-            if (m_lastSpaceTime + cMaxDelay > currentTime())
+            if (m_lastSpaceTime + cMaxDelay > SINGLETON_CURRENT_TIME)
             {
                 m_IMEDataInterface->sendKeyEvent(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier);
                 m_IMEDataInterface->sendKeyEvent(QEvent::KeyRelease, Qt::Key_Left, Qt::NoModifier);
@@ -70,7 +68,7 @@ bool ShortcutsHandler::filterKey(Qt::Key & key)
         else
         {
             if (key == Qt::Key_Space && m_lastKey != cNoKey && ::strchr(".,;:!?", m_lastKey) == 0)
-                m_lastSpaceTime = currentTime();
+                m_lastSpaceTime = SINGLETON_CURRENT_TIME;
             else
             {
                 m_lastSpaceTime = 0;

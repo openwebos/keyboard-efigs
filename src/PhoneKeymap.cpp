@@ -20,16 +20,12 @@
 #include "PhoneKeymap.h"
 
 #include "KeyLocationRecorder.h"
-// TODO (efigs): localization
-//#include "Localization.h"
 #include "PalmIMEHelpers.h"
-// TODO (efigs): virtualkeyboardpreferences
-//#include "VirtualKeyboardPreferences.h"
 
 #include <QFile>
 #include <qdebug.h>
-
 #include <pbnjson.hpp>
+#include <VirtualKeyboardPreferences.h>
 
 namespace Phone_Keyboard {
 
@@ -439,12 +435,17 @@ bool PhoneKeymap::setLanguageName(const std::string & name)
 
 void PhoneKeymap::keyboardCombosChanged()
 {
-    // TODO (efigs): virtualkeyboardpreferences
-// VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
-// int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), prefs.getKeyboardComboCount());
-// for (int k = 0; k < count; k++)
-//  sLanguageChoices_Extended[k] = (UKey) (cKey_KeyboardComboChoice_First + k);
-// sLanguageChoices_Extended[count] = cKey_None;
+    IMEDataInterface *iface = getIMEDataInterface();
+
+    if (iface) {
+        VirtualKeyboardPreferences &prefs = iface->virtualKeyboardPreferences();
+        int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), prefs.getKeyboardComboCount());
+
+        for (int k = 0; k < count; k++)
+            sLanguageChoices_Extended[k] = (UKey) (cKey_KeyboardComboChoice_First + k);
+
+        sLanguageChoices_Extended[count] = cKey_None;
+    }
 }
 
 inline float fabs(float f) { return f >= 0.f ? f : -f; }
@@ -928,15 +929,21 @@ PhoneKeymap::ETabAction PhoneKeymap::tabAction() const
 
 QString PhoneKeymap::getKeyDisplayString(UKey key, bool logging)
 {
+    IMEDataInterface *iface = getIMEDataInterface();
+
     if (UKeyIsFunctionKey(key))
     {
         if (UKeyIsKeyboardComboKey(key))
         {
-            // TODO (efigs): virtualkeyboardpreferences
-//   int index = key - cKey_KeyboardComboChoice_First;
-//   VirtualKeyboardPreferences & prefs = VirtualKeyboardPreferences::instance();
-//   if (VERIFY(index >= 0 && index < prefs.getKeyboardComboCount()))
-//    return prefs.getkeyboardCombo(index).language.c_str();
+            int index = key - cKey_KeyboardComboChoice_First;
+
+            if (iface) {
+                VirtualKeyboardPreferences &prefs = iface->virtualKeyboardPreferences();
+
+                if (index >= 0 && index < prefs.getKeyboardComboCount())
+                    return prefs.getkeyboardCombo(index).language.c_str();
+            }
+
             return NULL;
         }
 
@@ -986,8 +993,12 @@ QString PhoneKeymap::getKeyDisplayString(UKey key, bool logging)
         case cKey_SwitchToAzerty: return "AZERTY";
         case cKey_SwitchToQwertz: return "QWERTZ";
         case cKey_StartStopRecording: return KeyLocationRecorder::instance().isRecording() ? "Stop" : "Rec";
-        // TODO (efigs): virtualkeyboardpreferences
-//        case cKey_ToggleSoundFeedback:     return VirtualKeyboardPreferences::instance().getTapSounds() ? "Mute" : "Sound";
+        case cKey_ToggleSoundFeedback:
+            if (iface) {
+                return iface->virtualKeyboardPreferences().getTapSounds() ? "Mute" : "Sound";
+            } else {
+                return QString();
+            }
         case cKey_SymbolPicker: return "Sym";
         case Qt::Key_Shift: return logging ? "Shift" : QString();
         case Qt::Key_AltGr: return logging ? "AltGr" : QString();

@@ -21,22 +21,19 @@
 
 #include "KeyLocationRecorder.h"
 #include "PalmIMEHelpers.h"
-// TODO (efigs): virtualkeyboardpreferences
-//#include "VirtualKeyboardPreferences.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QApplication>
 #include <stdlib.h>
 #include <glib.h>
+#include <VirtualKeyboardPreferences.h>
 
 namespace Tablet_Keyboard {
 /**
  * temporary XML filename
  */
 #define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
-
-#define CURRENT_TIME currentTime()
 
 #define DOUBLE_TAP_DURATION 500
 
@@ -170,6 +167,8 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
 
     Q_ASSERT(m_IMEDataInterface);
 
+    setIMEDataInterface(m_IMEDataInterface);
+
     IMEPixmap::setDefaultLocation("keyboard-tablet");
 
     m_keymap.setIMEDataInterface(m_IMEDataInterface);
@@ -195,12 +194,13 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
 
     // init size
-    // TODO (efigs): virtualkeyboardpreferences
-    // VirtualKeyboardPreferences::instance().applyInitSettings(this);
+    m_IMEDataInterface->virtualKeyboardPreferences().applyInitSettings(this);
 }
 
 TabletKeyboard::~TabletKeyboard()
 {
+    setIMEDataInterface(0);
+
     if (s_instance == this)
         s_instance = NULL;
 }
@@ -288,8 +288,7 @@ void TabletKeyboard::showSuggestions(bool show)
         m_candidateBarLayoutOutdated = true;
         syncKeymap();
         keyboardLayoutChanged();
-        // TODO (efigs): virtualkeyboardpreferences
-//  VirtualKeyboardPreferences::instance().activateCombo(); // for language update...
+        m_IMEDataInterface->virtualKeyboardPreferences().activateCombo(); // for language update...
     }
 }
 
@@ -572,7 +571,7 @@ inline int MinMax(int min, int v, int max) { return v < min ? min : (v < max ? v
 
 void TabletKeyboard::updateTouch(int id, QPointF position)
 {
-    uint64_t now = CURRENT_TIME;
+    uint64_t now = SINGLETON_CURRENT_TIME;
     QPointF touchPosition(position.x(), position.y() - m_keymap.rect().top());
     UKey extendedKey;
     QPoint keyCoordinate = (!pointToExtendedPopup(touchPosition, extendedKey) && position.y() > m_keymap.rect().top() - m_keyboardTopPading) ? m_keymap.pointToKeyboard(position.toPoint(), m_diamondOptimization) : cOutside;
@@ -611,11 +610,11 @@ void TabletKeyboard::updateTouch(int id, QPointF position)
                 size = UKey(size + 1);
             //g_debug("Size: %d, height: %d, deltaY: %d, getKeyboardHeight(+1) - currentHeight = %d", size - cKey_Resize_Default, currentHeight, deltaY, getKeyboardHeight(UKey(size + 1)) - currentHeight);
             //g_debug("Size: %d, height: %d, deltaY: %d, getKeyboardHeight(-1) - currentHeight = %d", size - cKey_Resize_Default, currentHeight, deltaY, getKeyboardHeight(UKey(size - 1)) - currentHeight);
-            // TODO (efigs): virtualkeyboardpreferences
-//   if (UKeyIsKeyboardSizeKey(UKey(size - 1)) && 3 * deltaY <= 2 * (getKeyboardHeight(UKey(size - 1)) - currentHeight)) // going down
-//    VirtualKeyboardPreferences::instance().selectKeyboardSize(size - cKey_Resize_Default - 1);
-//   else if (UKeyIsKeyboardSizeKey(UKey(size + 1)) && 3 * deltaY >= 2 * (getKeyboardHeight(UKey(size + 1)) - currentHeight)) // going up
-//    VirtualKeyboardPreferences::instance().selectKeyboardSize(size - cKey_Resize_Default + 1);
+
+            if (UKeyIsKeyboardSizeKey(UKey(size - 1)) && 3 * deltaY <= 2 * (getKeyboardHeight(UKey(size - 1)) - currentHeight)) // going down
+                m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(size - cKey_Resize_Default - 1);
+            else if (UKeyIsKeyboardSizeKey(UKey(size + 1)) && 3 * deltaY >= 2 * (getKeyboardHeight(UKey(size + 1)) - currentHeight)) // going up
+                m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(size - cKey_Resize_Default + 1);
 #endif
         }
         return;
@@ -658,7 +657,7 @@ void TabletKeyboard::updateTouch(int id, QPointF position)
                     {
                         m_timer.start(newKey == cKey_Hide || m_candidateBar.isTraceActive() ? cFirstRepeatLongDelay : cFirstRepeatDelay);
                         m_repeatKey = keyCoordinate;
-                        m_repeatStartTime = CURRENT_TIME;
+                        m_repeatStartTime = SINGLETON_CURRENT_TIME;
                     }
                     else
                         stopRepeat();
@@ -745,9 +744,8 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
     }
     else if (UKeyIsKeyboardComboKey(key))
     {
-        // TODO (efigs): virtualkeyboardpreferences
-//  int index = key - cKey_KeyboardComboChoice_First;
-//  VirtualKeyboardPreferences::instance().selectKeyboardCombo(index);
+        int index = key - cKey_KeyboardComboChoice_First;
+        m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardCombo(index);
     }
     else
     {
@@ -774,7 +772,7 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
             break;
         case Qt::Key_Shift:
         {
-            uint64_t now = CURRENT_TIME;
+            uint64_t now = SINGLETON_CURRENT_TIME;
             if (m_lastUnlockTime + DOUBLE_TAP_DURATION > now)
             { // quick tap after unlocking: eat that tap, and next tap is like nothing happened before...
                 m_lastUnlockTime = 0;
@@ -812,15 +810,14 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
             showKeymapRegions();
             triggerRepaint();
             break;
-        // TODO (efigs): virtualkeyboardpreferences
         case cKey_SwitchToQwerty:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("qwerty");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwerty");
             break;
         case cKey_SwitchToAzerty:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("azerty");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("azerty");
             break;
         case cKey_SwitchToQwertz:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("qwertz");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwertz");
             break;
         case cKey_StartStopRecording:
         {
@@ -832,18 +829,17 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
             }
             break;
         }
-        // TODO (efigs): virtualkeyboardpreferences
         case cKey_ToggleLanguage:
-//   VirtualKeyboardPreferences::instance().selectNextKeyboardCombo();
+            m_IMEDataInterface->virtualKeyboardPreferences().selectNextKeyboardCombo();
             break;
         case cKey_CreateDefaultKeyboards:
-//   VirtualKeyboardPreferences::instance().createDefaultKeyboards();
+            m_IMEDataInterface->virtualKeyboardPreferences().createDefaultKeyboards();
             break;
         case cKey_ClearDefaultKeyboards:
-//   VirtualKeyboardPreferences::instance().clearDefaultDeyboards();
+            m_IMEDataInterface->virtualKeyboardPreferences().clearDefaultDeyboards();
             break;
         case cKey_ToggleSoundFeedback:
-//   VirtualKeyboardPreferences::instance().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+            m_IMEDataInterface->virtualKeyboardPreferences().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
             break;
         case Qt::Key_Left:
         case Qt::Key_Right:
@@ -873,8 +869,7 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
         case cKey_Resize_Small:
         case cKey_Resize_Default:
         case cKey_Resize_Large:
-            // TODO (efigs): virtualkeyboardpreferences
-//   VirtualKeyboardPreferences::instance().selectKeyboardSize(key - cKey_Resize_Default);
+            m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(key - cKey_Resize_Default);
             break;
         default:
             break;
@@ -1043,7 +1038,7 @@ void TabletKeyboard::repeatChar()
         if (canRepeat(key))
         {
             makeSound(key);
-            bool wordDelete = m_keymap.isShiftDown() || (CURRENT_TIME - m_repeatStartTime > cWordDeleteDelay);
+            bool wordDelete = m_keymap.isShiftDown() || (SINGLETON_CURRENT_TIME - m_repeatStartTime > cWordDeleteDelay);
             if (key == Qt::Key_Backspace)
                 sendKeyDownUp(Qt::Key_Backspace, wordDelete ? Qt::ShiftModifier : Qt::NoModifier);
             else
@@ -1621,9 +1616,8 @@ bool TabletKeyboard::setSymbolKeyDown(bool symbolKeyDown)
 
 void TabletKeyboard::makeSound(UKey key)
 {
-    // TODO (efigs): virtualkeyboardpreferences
-// if (VirtualKeyboardPreferences::instance().getTapSounds() && key != cKey_None)
-//  m_IMEDataInterface->keyDownAudioFeedback(key);
+    if (m_IMEDataInterface->virtualKeyboardPreferences().getTapSounds() && key != cKey_None)
+        m_IMEDataInterface->keyDownAudioFeedback(key);
 }
 
 void TabletKeyboard::queueIdlePrerendering()
@@ -1733,7 +1727,7 @@ bool TabletKeyboard::idle()
             extendedChars = m_keymap.getExtendedChars(QPoint(x, y));
             extendedIndex = 0;
         }
-        uint64_t timeLimit = CURRENT_TIME + 10; // process 10ms max
+        uint64_t timeLimit = SINGLETON_CURRENT_TIME + 10; // process 10ms max
         do {
             if (extendedChars)
             {
@@ -1764,7 +1758,7 @@ bool TabletKeyboard::idle()
                 extendedChars = m_keymap.getExtendedChars(QPoint(x, y));
                 extendedIndex = 0;
             }
-            if (CURRENT_TIME > timeLimit)
+            if (SINGLETON_CURRENT_TIME > timeLimit)
                 return true;
         } while (true);
 

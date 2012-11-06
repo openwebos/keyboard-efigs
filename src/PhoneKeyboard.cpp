@@ -22,16 +22,15 @@
 
 #include "KeyLocationRecorder.h"
 #include "PalmIMEHelpers.h"
-// TODO (efigs): virtualkeyboardpreferences
-//#include "VirtualKeyboardPreferences.h"
 
 #include <QDebug>
 #include <QFile>
 #include <QApplication>
 #include <stdlib.h>
 #include <glib.h>
-
 #include <sys/times.h>
+#include <IMEDataInterface.h>
+#include <VirtualKeyboardPreferences.h>
 
 namespace Phone_Keyboard {
 
@@ -39,8 +38,6 @@ namespace Phone_Keyboard {
  * temporary XML filename
  */
 #define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
-
-#define CURRENT_TIME currentTime()
 
 #define DOUBLE_TAP_DURATION 500
 
@@ -166,6 +163,8 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
 
     Q_ASSERT(m_IMEDataInterface);
 
+    setIMEDataInterface(m_IMEDataInterface);
+
     IMEPixmap::setDefaultLocation("keyboard-phone");
 
     m_keymap.setIMEDataInterface(m_IMEDataInterface);
@@ -188,12 +187,13 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
     connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
 
     // init size
-    // TODO (efigs): virtualkeyboardpreferences
-// VirtualKeyboardPreferences::instance().applyInitSettings(this);
+    m_IMEDataInterface->virtualKeyboardPreferences().applyInitSettings(this);
 }
 
 PhoneKeyboard::~PhoneKeyboard()
 {
+    setIMEDataInterface(0);
+
     if (s_instance == this)
         s_instance = NULL;
 }
@@ -281,8 +281,7 @@ void PhoneKeyboard::showSuggestions(bool show)
         m_candidateBarLayoutOutdated = true;
         syncKeymap();
         keyboardLayoutChanged();
-        // TODO (efigs): virtualkeyboardpreferences
-//  VirtualKeyboardPreferences::instance().activateCombo(); // for language update...
+        m_IMEDataInterface->virtualKeyboardPreferences().activateCombo(); // for language update...
     }
 }
 
@@ -544,7 +543,7 @@ inline int MinMax(int min, int v, int max) { return v < min ? min : (v < max ? v
 
 void PhoneKeyboard::updateTouch(int id, QPointF position)
 {
-    uint64_t now = CURRENT_TIME;
+    uint64_t now = SINGLETON_CURRENT_TIME;
     QPointF  touchPosition(position.x(), position.y() - m_keymap.rect().top());
     UKey  extendedKey;
     QPoint  keyCoordinate = (!pointToExtendedPopup(touchPosition, extendedKey) && position.y() > m_keymap.rect().top() - m_keyboardTopPading) ? m_keymap.pointToKeyboard(position.toPoint()) : cOutside;
@@ -603,7 +602,7 @@ void PhoneKeyboard::updateTouch(int id, QPointF position)
                     {
                         m_timer.start(newKey == cKey_Hide || m_candidateBar.isTraceActive() ? cFirstRepeatLongDelay : cFirstRepeatDelay);
                         m_repeatKey = keyCoordinate;
-                        m_repeatStartTime = CURRENT_TIME;
+                        m_repeatStartTime = SINGLETON_CURRENT_TIME;
                     }
                     else
                         stopRepeat();
@@ -682,8 +681,7 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
     else if (UKeyIsKeyboardComboKey(key))
     {
         int index = key - cKey_KeyboardComboChoice_First;
-        // TODO (efigs): virtualkeyboardpreferences
-//  VirtualKeyboardPreferences::instance().selectKeyboardCombo(index);
+        m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardCombo(index);
     }
     else
     {
@@ -710,7 +708,7 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
             break;
         case Qt::Key_Shift:
         {
-            uint64_t now = CURRENT_TIME;
+            uint64_t now = SINGLETON_CURRENT_TIME;
             if (m_lastUnlockTime + DOUBLE_TAP_DURATION > now)
             { // quick tap after unlocking: eat that tap, and next tap is like nothing happened before...
                 m_lastUnlockTime = 0;
@@ -748,15 +746,14 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
             showKeymapRegions();
             triggerRepaint();
             break;
-        // TODO (efigs): virtualkeyboardpreferences
         case cKey_SwitchToQwerty:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("qwerty");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwerty");
             break;
         case cKey_SwitchToAzerty:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("azerty");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("azerty");
             break;
         case cKey_SwitchToQwertz:
-//   VirtualKeyboardPreferences::instance().selectLayoutCombo("qwertz");
+            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwertz");
             break;
         case cKey_StartStopRecording:
         {
@@ -768,18 +765,17 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
             }
             break;
         }
-        // TODO (efigs): virtualkeyboardpreferences
         case cKey_ToggleLanguage:
-//   VirtualKeyboardPreferences::instance().selectNextKeyboardCombo();
+            m_IMEDataInterface->virtualKeyboardPreferences().selectNextKeyboardCombo();
             break;
         case cKey_CreateDefaultKeyboards:
-//   VirtualKeyboardPreferences::instance().createDefaultKeyboards();
+            m_IMEDataInterface->virtualKeyboardPreferences().createDefaultKeyboards();
             break;
         case cKey_ClearDefaultKeyboards:
-//   VirtualKeyboardPreferences::instance().clearDefaultDeyboards();
+            m_IMEDataInterface->virtualKeyboardPreferences().clearDefaultDeyboards();
             break;
         case cKey_ToggleSoundFeedback:
-//   VirtualKeyboardPreferences::instance().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+            m_IMEDataInterface->virtualKeyboardPreferences().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
             break;
         case Qt::Key_Left:
             qtkey = Qt::Key_Left; // used to navigate the cursor left
@@ -960,7 +956,7 @@ void PhoneKeyboard::repeatChar()
         if (canRepeat(key))
         {
             makeSound(key);
-            bool wordDelete = m_keymap.isShiftDown() || (CURRENT_TIME - m_repeatStartTime > cWordDeleteDelay);
+            bool wordDelete = m_keymap.isShiftDown() || (SINGLETON_CURRENT_TIME - m_repeatStartTime > cWordDeleteDelay);
             if (key == Qt::Key_Backspace)
                 sendKeyDownUp(Qt::Key_Backspace, wordDelete ? Qt::ShiftModifier : Qt::NoModifier);
             else
@@ -1579,8 +1575,7 @@ bool PhoneKeyboard::setSymbolKeyDown(bool symbolKeyDown)
 
 void PhoneKeyboard::makeSound(UKey key)
 {
-    // TODO (efigs): virtualkeyboardpreferences
-// if (VirtualKeyboardPreferences::instance().getTapSounds() && key != cKey_None)
+    if (m_IMEDataInterface->virtualKeyboardPreferences().getTapSounds() && key != cKey_None)
         m_IMEDataInterface->keyDownAudioFeedback(key);
 }
 
@@ -1689,7 +1684,7 @@ bool PhoneKeyboard::idle()
             extendedChars = m_keymap.getExtendedChars(QPoint(x, y));
             extendedIndex = 0;
         }
-        uint64_t timeLimit = CURRENT_TIME + 10; // process 10ms max
+        uint64_t timeLimit = SINGLETON_CURRENT_TIME + 10; // process 10ms max
         do {
             if (extendedChars)
             {
@@ -1713,7 +1708,7 @@ bool PhoneKeyboard::idle()
                 extendedChars = m_keymap.getExtendedChars(QPoint(x, y));
                 extendedIndex = 0;
             }
-            if (CURRENT_TIME > timeLimit)
+            if (SINGLETON_CURRENT_TIME > timeLimit)
                 return true;
         } while (true);
         sInitExtendedGlyphs = false;

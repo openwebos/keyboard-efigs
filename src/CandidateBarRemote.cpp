@@ -224,21 +224,26 @@ void CandidateBarRemote::updateSuggestions(bool trace)
     std::string msgStr = jsonToString(msg);
     //g_debug("Sending: %s", msgStr.c_str());
 
-    // TODO (efigs): hostbase/mainloop
-// LSError lserror;
-// LSErrorInit(&lserror);
+    GMainLoop *loop = m_IMEDataInterface->getMainLoop();
 
-// if (m_serviceHandle || (LSRegister(NULL, &m_serviceHandle, &lserror) &&
-//  LSGmainAttach(m_serviceHandle, HostBase::instance()->mainLoop(), &lserror)))
-// {
-//  LSCall(m_serviceHandle, "palm://com.palm.smartKey/processTaps",
-//      msgStr.c_str(), smartkeyReplyHandler, this, NULL, &lserror);
-// }
-// if (LSErrorIsSet(&lserror))
-// {
-//  qCritical() << lserror.message << lserror.file << lserror.line << lserror.func;
-//  LSErrorFree(&lserror);
-// }
+    if (loop) {
+        LSError lserror;
+        LSErrorInit(&lserror);
+
+        if (m_serviceHandle || (LSRegister(NULL, &m_serviceHandle, &lserror) &&
+            LSGmainAttach(m_serviceHandle, loop, &lserror)))
+        {
+            LSCall(m_serviceHandle, "palm://com.palm.smartKey/processTaps",
+                   msgStr.c_str(), smartkeyReplyHandler, this, NULL, &lserror);
+        }
+        if (LSErrorIsSet(&lserror))
+        {
+            qCritical() << lserror.message << lserror.file << lserror.line << lserror.func;
+            LSErrorFree(&lserror);
+        }
+    } else {
+        qCritical() << Q_FUNC_INFO << "Couldn't get main loop instance! Message sending failed.";
+    }
 }
 
 void CandidateBarRemote::drawXT9Regions(QPixmap * pixmap, int topPadding)

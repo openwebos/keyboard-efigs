@@ -25,6 +25,18 @@
 #include <sys/times.h>
 #include <unistd.h>
 
+static IMEDataInterface *imeDataInterface = 0;
+
+IMEDataInterface *getIMEDataInterface()
+{
+    return imeDataInterface;
+}
+
+void setIMEDataInterface(IMEDataInterface *iface)
+{
+    imeDataInterface = iface;
+}
+
 std::string string_printf(const char *format, ...)
 {
     if (format == 0)

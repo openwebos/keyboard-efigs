@@ -17,11 +17,14 @@
 * LICENSE@@@ */
 
 
-
+// TODO: replace IMEDataInterface.h in LunaSysMgr with this one
 
 #ifndef IMEDATAINTERFACE_H
 #define IMEDATAINTERFACE_H
 
+class VirtualKeyboardPreferences;
+
+#include <glib.h>
 #include "IMEData.h"
 
 #if 0
@@ -119,7 +122,25 @@ public:
     //! Gets value of \a key from system settings (luna.conf)
     virtual QVariant getLunaSystemSetting(const QString &key) = 0;
 
-    virtual QString getLocalizedString(const std::string& str) = 0;
+    virtual QString getLocalizedString(const std::string &str) = 0;
+
+    virtual std::string getLocale() = 0;
+
+    virtual void createRemoveBannerMessage(const std::string &appId,
+                                           const std::string&msgId) = 0;
+
+    virtual std::string createAddBannerMessage(const std::string &appId,
+                                               const std::string &msg,
+                                               const std::string &launchParams,
+                                               const std::string &icon,
+                                               const std::string &soundClass,
+                                               const std::string &soundFile,
+                                               int duration,
+                                               bool doNotSuppress) = 0;
+
+    virtual VirtualKeyboardPreferences &virtualKeyboardPreferences() = 0;
+
+    virtual GMainLoop *getMainLoop() = 0;
 };
 
 #endif // IMEDATAINTERFACE_H

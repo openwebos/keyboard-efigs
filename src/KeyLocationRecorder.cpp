@@ -20,14 +20,13 @@
 
 
 #include "KeyLocationRecorder.h"
-// TODO (efigs): bannermessage
-//#include "BannerMessageHandler.h"
-//#include "BannerMessageEventFactory.h"
 
 #include <time.h>
 #include <QString>
-#include "PalmIMEHelpers.h"
 #include <sys/stat.h>
+
+#include "IMEDataInterface.h"
+#include "PalmIMEHelpers.h"
 
 #if defined(TARGET_DEVICE)
 #define PATH_PREFIX "/media/internal"
@@ -50,6 +49,7 @@ KeyLocationRecorder & KeyLocationRecorder::instance()
 void KeyLocationRecorder::startStop(const char * layoutName, const QRect & keymapRect)
 {
     std::string msg;
+
     if (m_file)
     {
         fclose(m_file);
@@ -68,21 +68,16 @@ void KeyLocationRecorder::startStop(const char * layoutName, const QRect & keyma
         keyboardSizeChanged(layoutName, keymapRect);
         msg = "Virtual Keyboard Recording Started!";
     }
-    if (!m_lastMessageID.empty())
-    {
-        // TODO (efigs): bannermessage
-//  BannerMessageEvent* e = BannerMessageEventFactory::createRemoveMessageEvent(sAppID, m_lastMessageID);
-//  BannerMessageHandler::instance()->handleBannerMessageEvent(e);
-//  m_lastMessageID.clear();
-//  delete e;
+
+    IMEDataInterface *iface = getIMEDataInterface();
+
+    if (iface && !m_lastMessageID.empty()) {
+        iface->createRemoveBannerMessage(sAppID, m_lastMessageID);
+        m_lastMessageID.clear();
     }
-    if (!msg.empty())
-    {
-        // TODO (efigs): bannermessage
-//  BannerMessageEvent* e = BannerMessageEventFactory::createAddMessageEvent(sAppID, msg, "{ }", "", "", "", -1, false);
-//  m_lastMessageID = e->msgId;
-//  BannerMessageHandler::instance()->handleBannerMessageEvent(e);
-//  delete e;
+
+    if (iface && !msg.empty()) {
+        m_lastMessageID = iface->createAddBannerMessage(sAppID, msg, "{ }", "", "", "", -1, false);
     }
 }
 

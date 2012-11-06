@@ -40,10 +40,10 @@ class IMEPixmap
 public:
     IMEPixmap(const char * name = "") : m_name(name) { s_PalmPixmaps.push_back(this); }
 
-    void   setName(const char * name) { m_name = name; }
+    void setName(const char * name) { m_name = name; }
 
-                    operator QPixmap &()  { return pixmap(); }
-    QPixmap &  pixmap();
+    operator QPixmap &()  { return pixmap(); }
+    QPixmap &pixmap();
 
     int width() { return pixmap().width(); }
     int height() { return pixmap().height(); }

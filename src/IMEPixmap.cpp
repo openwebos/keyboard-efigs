@@ -22,7 +22,6 @@
 #include "IMEPixmap.h"
 #include "IMEDataInterface.h"
 #include "PalmIMEHelpers.h"
-#include "PhoneKeyboard.h"
 #include "GlyphCache.h"
 
 #include <QDebug>
@@ -35,32 +34,28 @@ std::vector<IMEPixmap*> IMEPixmap::s_PalmPixmaps;
 
 const char * IMEPixmap::s_defaultLocation = NULL;
 
-QPixmap & IMEPixmap::pixmap()
+QPixmap &IMEPixmap::pixmap()
 {
     if (m_pixmap.isNull()) {
         if (*m_name == '/') {
             m_pixmap.load(m_name);
         } else {
-            Phone_Keyboard::PhoneKeyboard *kb = Phone_Keyboard::PhoneKeyboard::getExistingInstance();
+            IMEDataInterface *iface = getIMEDataInterface();
 
-            if (kb) {
-                IMEDataInterface *iface = kb->dataInterface();
+            if (iface) {
+                QString filename = iface->getLunaSystemSetting("SystemResourcesPath").toString();
 
-                if (iface) {
-                    QString filename = iface->getLunaSystemSetting("SystemResourcesPath").toString();
-
-                    if (s_defaultLocation) {
-                        filename += '/';
-                        filename += s_defaultLocation;
-                        filename += '/';
-                        filename += m_name;
-                    } else {
-                        filename += "/keyboard/";
-                        filename += m_name;
-                    }
-
-                    m_pixmap.load(filename);
+                if (s_defaultLocation) {
+                    filename += '/';
+                    filename += s_defaultLocation;
+                    filename += '/';
+                    filename += m_name;
+                } else {
+                    filename += "/keyboard/";
+                    filename += m_name;
                 }
+
+                m_pixmap.load(filename);
             }
         }
     }
@@ -270,7 +265,7 @@ void PixmapCache::schedulePurge()
 #if DELAY_PURGE_PIXMAP
         if (m_purgeTime == 0)
             g_timeout_add_seconds(1, delayedPurge, NULL);
-        m_purgeTime = currentTime() + 1000;
+        m_purgeTime = SINGLETON_CURRENT_TIME + 1000;
 #else
         delayedPurge();
 #endif
@@ -286,7 +281,7 @@ gboolean PixmapCache::delayedPurge()
 {
     if (!m_suspended)
     {
-        if (currentTime() >= m_purgeTime)
+        if (SINGLETON_CURRENT_TIME >= m_purgeTime)
         {
             if (m_stock.size() > 0)
             {

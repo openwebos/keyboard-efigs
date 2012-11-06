@@ -20,8 +20,8 @@ TEMPLATE = lib
 TARGET = keyboard-efigs
 DEPENDPATH += . include src
 INCLUDEPATH += . include \
- include/ime \
- $$(STAGING_INCDIR)/ime
+    include/ime \
+    $$(STAGING_INCDIR)/ime
 
 QT += core gui
 CONFIG += plugin
@@ -31,35 +31,36 @@ PKGCONFIG = glib-2.0 gthread-2.0
 
 # Input
 HEADERS += include/CandidateBar.h \
- include/CandidateBarRemote.h \
- include/GlyphCache.h \
- include/IMEPixmap.h \
- include/JSONUtils.h \
- include/KeyLocationRecorder.h \
- include/PalmIMEHelpers.h \
- include/PhoneKeyboard.h \
- include/PhoneKeymap.h \
- include/ShortcutsHandler.h \
- include/TabletKeyboard.h \
- include/TabletKeymap.h \
-# include/Utils.h \
-# include/ime/IMEData.h \
- include/ime/IMEData.h_generator.h \
- include/ime/IMEDataInterface.h \
+    include/CandidateBarRemote.h \
+    include/GlyphCache.h \
+    include/IMEPixmap.h \
+    include/JSONUtils.h \
+    include/KeyLocationRecorder.h \
+    include/PalmIMEHelpers.h \
+    include/PhoneKeyboard.h \
+    include/PhoneKeymap.h \
+    include/ShortcutsHandler.h \
+    include/TabletKeyboard.h \
+    include/TabletKeymap.h \
+# TODO: remove
+    include/ime/IMEData.h_generator.h \
+    include/ime/IMEDataInterface.h \
+#    include/ime/SysmgrIMEDataInterface.h
 
 SOURCES += src/CandidateBar.cpp \
- src/CandidateBarRemote.cpp \
- src/GlyphCache.cpp \
- src/IMEPixmap.cpp \
- src/JSONUtils.cpp \
- src/KeyLocationRecorder.cpp \
- src/PalmIMEHelpers.cpp \
- src/PhoneKeyboard.cpp \
- src/PhoneKeymap.cpp \
- src/ShortcutsHandler.cpp \
- src/TabletKeyboard.cpp \
- src/TabletKeymap.cpp \
-# src/Utils.cpp
+    src/CandidateBarRemote.cpp \
+    src/GlyphCache.cpp \
+    src/IMEPixmap.cpp \
+    src/JSONUtils.cpp \
+    src/KeyLocationRecorder.cpp \
+    src/PalmIMEHelpers.cpp \
+    src/PhoneKeyboard.cpp \
+    src/PhoneKeymap.cpp \
+    src/ShortcutsHandler.cpp \
+    src/TabletKeyboard.cpp \
+    src/TabletKeymap.cpp \
+# TODO: remove
+#    src/ime/SysmgrIMEDataInterface.cpp
 
 DESTDIR = build
 
