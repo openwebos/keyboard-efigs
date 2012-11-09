@@ -1,6 +1,6 @@
 # @@@LICENSE
 #
-#      Copyright (c) 2012 Hewlett-Packard Development Company, L.P.
+#      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,16 +16,17 @@
 #
 # LICENSE@@@
 
-# Common Eclipse project files
-.project
-.cproject
+QMAKE_MAKEFILE = Makefile
 
-# Ignore all build directories and their trees. This should exclude all
-# build products.
-/BUILD*
-/build*
-/release*
-/debug*
+BUILD_TYPE = release
+CONFIG -= debug
+CONFIG += release
 
-Makefile*
-*.pro.user
+MACHINE_NAME = $$(MACHINE)
+
+INCLUDEPATH += $$(STAGING_INCDIR)/ime \
+    $$(STAGING_INCDIR)/glib-2.0
+
+DEFINES += TARGET_DEVICE
+
+target.path = $$(STAGING_DIR)/usr/lib/luna
