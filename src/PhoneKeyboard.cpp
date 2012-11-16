@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QApplication>
+#include <QtPlugin>
 #include <stdlib.h>
 #include <glib.h>
 #include <sys/times.h>
@@ -87,21 +88,37 @@ const QColor cBlueColor_back(255, 255, 255);
 const QColor cPopoutTextColor(20, 20, 20);
 const QColor cPopoutTextColor_back(0xe2, 0xe2, 0xe2);
 
-class PhoneKeyboardFactory : public VirtualKeyboardFactory
+PhoneKeyboardFactory::PhoneKeyboardFactory() :
+    m_virtualKeyboard(0)
 {
-public:
-    PhoneKeyboardFactory() : VirtualKeyboardFactory("Phone Keyboard")  {}
-    InputMethod * create(IMEDataInterface * dataInterface)    { return new PhoneKeyboard(dataInterface); }
-    EVirtualKeyboardSupport getSupport(int maxWidth, int maxHeight)
-    {
-//  return eVirtualKeyboardSupport_Preferred_SizeAndLocale;  // force phone keyboard for testing!
-        if (maxWidth < 1024 && maxHeight < 1024)
-            return eVirtualKeyboardSupport_Preferred_Size;
-        return eVirtualKeyboardSupport_Poor;
-    }
-};
+}
 
-static PhoneKeyboardFactory sPhoneKeyboardFactory;
+QString PhoneKeyboardFactory::name() const
+{
+    return QString("Phone Keyboard");
+}
+
+InputMethod *PhoneKeyboardFactory::newVirtualKeyboard(IMEDataInterface *dataInterface)
+{
+    if (!m_virtualKeyboard) {
+        m_virtualKeyboard = new PhoneKeyboard(dataInterface);
+    }
+
+    return m_virtualKeyboard;
+}
+
+VirtualKeyboardFactory::EVirtualKeyboardSupport
+    PhoneKeyboardFactory::getSupport(int maxWidth, int maxHeight,
+                                     int dpi, const char *locale)
+{
+    (void)dpi;(void)locale;
+
+    //  return eVirtualKeyboardSupport_Preferred_SizeAndLocale;  // force phone keyboard for testing!
+    if (maxWidth < 1024 && maxHeight < 1024)
+        return eVirtualKeyboardSupport_Preferred_Size;
+
+    return eVirtualKeyboardSupport_Poor;
+}
 
 static gboolean keyboard_idle(gpointer)
 {
@@ -1734,3 +1751,5 @@ bool PhoneKeyboard::idle()
 }
 
 }; // namespace Phone_Keyboard
+
+Q_EXPORT_PLUGIN2(keyboard-efigs-phone, Phone_Keyboard::PhoneKeyboardFactory)

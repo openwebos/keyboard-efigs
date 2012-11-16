@@ -16,13 +16,12 @@
 #
 # LICENSE@@@
 
-QMAKE_MAKEFILE = Makefile
-
 BUILD_TYPE = release
 CONFIG -= debug
 CONFIG += release
 
 MACHINE_NAME = $$(MACHINE)
+STAGINGDIR = $$(STAGING_INCDIR)
 
 INCLUDEPATH += $$(STAGING_INCDIR)/ime \
     $$(STAGING_INCDIR)/glib-2.0

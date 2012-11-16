@@ -17,6 +17,7 @@
 # LICENSE@@@
 
 MACHINE_NAME = $$(MACHINE)
+STAGINGDIR = $$(STAGING_INCDIR)
 
 contains(MACHINE_NAME, "qemux86") {
     CONFIG_BUILD += webosemulator
@@ -32,8 +33,6 @@ contains(MACHINE_NAME, "qemuarmv7a") {
 }
 
 contains (CONFIG_BUILD, webosemulator) {
-    QMAKE_MAKEFILE = Makefile
-
     BUILD_TYPE = release
     CONFIG -= debug
     CONFIG += release

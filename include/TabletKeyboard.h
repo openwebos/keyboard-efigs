@@ -27,8 +27,8 @@
 
 #include <map>
 #include <stdint.h>
+#include <VirtualKeyboard.h>
 
-#include "VirtualKeyboard.h"
 #include "TabletKeymap.h"
 #include "IMEPixmap.h"
 #include "GlyphCache.h"
@@ -283,6 +283,25 @@ private:
 
     NineTileSprites m_nineTileSprites;
     GlyphCache<GlyphSpec> m_glyphCache;
+};
+
+class TabletKeyboardFactory : public QObject, public VirtualKeyboardFactory
+{
+    Q_OBJECT
+    Q_INTERFACES(VirtualKeyboardFactory)
+
+public:
+    TabletKeyboardFactory();
+
+    virtual QString name() const;
+
+    virtual InputMethod *newVirtualKeyboard(IMEDataInterface *dataInterface);
+
+    virtual VirtualKeyboardFactory::EVirtualKeyboardSupport
+        getSupport(int maxWidth, int maxHeight, int dpi, const char *locale);
+
+private:
+    TabletKeyboard *m_virtualKeyboard;
 };
 
 }; // namespace TabletKeyboard

@@ -16,6 +16,12 @@
 #
 # LICENSE@@@
 
-TEMPLATE = subdirs
-SUBDIRS = keyboard-efigs-phone \
-    keyboard-efigs-tablet
+TARGET = keyboard-efigs-tablet
+
+include(../common.pri)
+
+HEADERS += ../include/TabletKeyboard.h \
+    ../include/TabletKeymap.h
+
+SOURCES += ../src/TabletKeyboard.cpp \
+    ../src/TabletKeymap.cpp

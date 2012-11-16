@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QApplication>
+#include <QtPlugin>
 #include <stdlib.h>
 #include <glib.h>
 #include <VirtualKeyboardPreferences.h>
@@ -81,20 +82,36 @@ const QColor cFunctionColor_back(0, 0, 0);
 const QColor cBlueColor(75, 151, 222);
 const QColor cBlueColor_back(255, 255, 255);
 
-class TabletKeyboardFactory : public VirtualKeyboardFactory
+TabletKeyboardFactory::TabletKeyboardFactory() :
+    m_virtualKeyboard(0)
 {
-public:
-    TabletKeyboardFactory() : VirtualKeyboardFactory("Tablet Keyboard")  {}
-    InputMethod * create(IMEDataInterface * dataInterface)    { return new TabletKeyboard(dataInterface); }
-    EVirtualKeyboardSupport getSupport(int maxWidth, int maxHeight)
-    {
-        if (maxWidth >= 1024 || maxHeight >= 1024)
-            return eVirtualKeyboardSupport_Preferred_Size;
-        return eVirtualKeyboardSupport_Poor;
-    }
-};
+}
 
-static TabletKeyboardFactory sTabletKeyboardFactory;
+QString TabletKeyboardFactory::name() const
+{
+    return QString("Tablet Keyboard");
+}
+
+InputMethod *TabletKeyboardFactory::newVirtualKeyboard(IMEDataInterface *dataInterface)
+{
+    if (!m_virtualKeyboard) {
+        m_virtualKeyboard = new TabletKeyboard(dataInterface);
+    }
+
+    return m_virtualKeyboard;
+}
+
+VirtualKeyboardFactory::EVirtualKeyboardSupport
+    TabletKeyboardFactory::getSupport(int maxWidth, int maxHeight,
+                                      int dpi, const char *locale)
+{
+    (void)dpi;(void)locale;
+
+    if (maxWidth >= 1024 || maxHeight >= 1024)
+        return eVirtualKeyboardSupport_Preferred_Size;
+
+    return eVirtualKeyboardSupport_Poor;
+}
 
 static gboolean keyboard_idle(gpointer)
 {
@@ -1785,3 +1802,5 @@ bool TabletKeyboard::idle()
 }
 
 }; // namespace Tablet_Keyboard
+
+Q_EXPORT_PLUGIN2(keyboard-efigs-tablet, Tablet_Keyboard::TabletKeyboardFactory)

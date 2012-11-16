@@ -19,14 +19,13 @@
 CONFIG += debug
 
 debug {
-    QMAKE_MAKEFILE = Makefile.Ubuntu
     BUILD_TYPE = debug
 } else {
-    QMAKE_MAKEFILE = Makefile.Ubuntu.Release
     BUILD_TYPE = release
 }
 
 MACHINE_NAME = x86
+STAGINGDIR = $$(LUNA_STAGING)
 
 DEFINES += TARGET_DESKTOP
 
@@ -45,4 +44,4 @@ INCLUDEPATH += \
     $$(LUNA_STAGING)/include/QtDeclarative \
     $$(LUNA_STAGING)/include/ime
 
-target.path = $$(LUNA_STAGING)/usr/lib/luna
+target.path = $$(ROOTFS)/usr/lib/luna
