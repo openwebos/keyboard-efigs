@@ -18,4 +18,6 @@
 
 TEMPLATE = subdirs
 SUBDIRS = keyboard-efigs-phone \
-    keyboard-efigs-tablet
+          keyboard-efigs-tablet
+
+#SUBDIRS += plugin-example
