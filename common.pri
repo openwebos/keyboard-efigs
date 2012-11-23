@@ -22,8 +22,7 @@ DEPENDPATH += . \
     ../include \
     ../src
 INCLUDEPATH += . \
-    ../include \
-#    ../include/ime   # TODO: remove this line, the ime folder and its contents when the real headers are exported from luna-sysmgr
+    ../include
 
 QT += core gui
 CONFIG += plugin
