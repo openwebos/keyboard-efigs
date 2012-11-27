@@ -83,8 +83,17 @@ const QColor cBlueColor(75, 151, 222);
 const QColor cBlueColor_back(255, 255, 255);
 
 TabletKeyboardFactory::TabletKeyboardFactory() :
-    m_virtualKeyboard(0)
+    m_virtualKeyboard(0),
+    m_preferredDpiMaximum(250),
+    m_preferredMinimumWidth(1024),
+    m_preferredMinimumHeight(1024)
 {
+    // TODO: Are these defined somewhere?
+    m_supportedLocales.append("en");
+    m_supportedLocales.append("fr");
+    m_supportedLocales.append("it");
+    m_supportedLocales.append("de");
+    m_supportedLocales.append("es");
 }
 
 QString TabletKeyboardFactory::name() const
@@ -103,14 +112,37 @@ InputMethod *TabletKeyboardFactory::newVirtualKeyboard(IMEDataInterface *dataInt
 
 VirtualKeyboardFactory::EVirtualKeyboardSupport
     TabletKeyboardFactory::getSupport(int maxWidth, int maxHeight,
-                                      int dpi, const char *locale)
+                                      int dpi, const std::string locale)
 {
-    (void)dpi;(void)locale;
+    bool goodDpi(dpi <= m_preferredDpiMaximum);
+    bool localeSupported = localeIsSupported(locale);
+    bool preferredSize = (maxWidth >= m_preferredMinimumWidth ||
+                          maxHeight >= m_preferredMinimumHeight);
 
-    if (maxWidth >= 1024 || maxHeight >= 1024)
+    if (localeSupported && goodDpi && preferredSize) {
+        return eVirtualKeyboardSupport_Preferred_SizeDpiAndLocale;
+    } else if (localeSupported && preferredSize) {
+        return eVirtualKeyboardSupport_Preferred_SizeAndLocale;
+    } else if (localeSupported) {
+        return eVirtualKeyboardSupport_Preferred_Locale;
+    } else if (preferredSize) {
         return eVirtualKeyboardSupport_Preferred_Size;
+    } else {
+        return eVirtualKeyboardSupport_Poor;
+    }
+}
 
-    return eVirtualKeyboardSupport_Poor;
+bool TabletKeyboardFactory::localeIsSupported(const std::string locale)
+{
+    QString l(locale.c_str());
+
+    for (int i = 0; i < m_supportedLocales.size(); ++i) {
+        if (l.startsWith(m_supportedLocales.at(i))) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static gboolean keyboard_idle(gpointer)

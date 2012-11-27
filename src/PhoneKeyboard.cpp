@@ -89,8 +89,17 @@ const QColor cPopoutTextColor(20, 20, 20);
 const QColor cPopoutTextColor_back(0xe2, 0xe2, 0xe2);
 
 PhoneKeyboardFactory::PhoneKeyboardFactory() :
-    m_virtualKeyboard(0)
+    m_virtualKeyboard(0),
+    m_preferredDpiMinimum(250),
+    m_preferredMaximumWidth(1024),
+    m_preferredMaximumHeight(1024)
 {
+    // TODO: Are these defined somewhere?
+    m_supportedLocales.append("en");
+    m_supportedLocales.append("fr");
+    m_supportedLocales.append("it");
+    m_supportedLocales.append("de");
+    m_supportedLocales.append("es");
 }
 
 QString PhoneKeyboardFactory::name() const
@@ -109,15 +118,38 @@ InputMethod *PhoneKeyboardFactory::newVirtualKeyboard(IMEDataInterface *dataInte
 
 VirtualKeyboardFactory::EVirtualKeyboardSupport
     PhoneKeyboardFactory::getSupport(int maxWidth, int maxHeight,
-                                     int dpi, const char *locale)
+                                     int dpi, const std::string locale)
 {
-    (void)dpi;(void)locale;
+    bool goodDpi(dpi >= m_preferredDpiMinimum);
+    bool localeSupported = localeIsSupported(locale);
+    bool preferredSize = (maxWidth < m_preferredMaximumWidth &&
+                          maxHeight < m_preferredMaximumHeight);
 
-    //  return eVirtualKeyboardSupport_Preferred_SizeAndLocale;  // force phone keyboard for testing!
-    if (maxWidth < 1024 && maxHeight < 1024)
+    if (localeSupported && goodDpi && preferredSize) {
+        return eVirtualKeyboardSupport_Preferred_SizeDpiAndLocale;
+    } else if (localeSupported && preferredSize) {
+        return eVirtualKeyboardSupport_Preferred_SizeAndLocale;
+    } else if (localeSupported) {
+        return eVirtualKeyboardSupport_Preferred_Locale;
+    } else if (preferredSize) {
         return eVirtualKeyboardSupport_Preferred_Size;
+    } else {
+        return eVirtualKeyboardSupport_Poor;
+    }
+}
 
-    return eVirtualKeyboardSupport_Poor;
+
+bool PhoneKeyboardFactory::localeIsSupported(const std::string locale)
+{
+    QString l(locale.c_str());
+
+    for (int i = 0; i < m_supportedLocales.size(); ++i) {
+        if (l.startsWith(m_supportedLocales.at(i))) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 static gboolean keyboard_idle(gpointer)

@@ -298,10 +298,16 @@ public:
     virtual InputMethod *newVirtualKeyboard(IMEDataInterface *dataInterface);
 
     virtual VirtualKeyboardFactory::EVirtualKeyboardSupport
-        getSupport(int maxWidth, int maxHeight, int dpi, const char *locale);
+        getSupport(int maxWidth, int maxHeight, int dpi, const std::string locale);
 
 private:
     TabletKeyboard *m_virtualKeyboard;
+    QStringList m_supportedLocales;
+    int m_preferredDpiMaximum;
+    int m_preferredMinimumWidth;
+    int m_preferredMinimumHeight;
+
+    bool localeIsSupported(const std::string locale);
 };
 
 }; // namespace TabletKeyboard

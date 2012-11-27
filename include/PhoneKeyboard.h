@@ -291,10 +291,16 @@ public:
     virtual InputMethod *newVirtualKeyboard(IMEDataInterface *dataInterface);
 
     virtual VirtualKeyboardFactory::EVirtualKeyboardSupport
-        getSupport(int maxWidth, int maxHeight, int dpi, const char *locale);
+        getSupport(int maxWidth, int maxHeight, int dpi, const std::string locale);
 
 private:
     PhoneKeyboard *m_virtualKeyboard;
+    QStringList m_supportedLocales;
+    int m_preferredDpiMinimum;
+    int m_preferredMaximumWidth;
+    int m_preferredMaximumHeight;
+
+    bool localeIsSupported(const std::string locale);
 };
 
 }; // namespace PhoneKeyboard
