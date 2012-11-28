@@ -76,12 +76,12 @@ linux-g++ {
     }
 }
 
-# Add rest of the needed headers after setting $$STAGINGDIR in platform .pri file
-HEADERS += $${STAGINGDIR}/include/ime/IMEData.h \
-    $${STAGINGDIR}/include/ime/IMEDataInterface.h \
-    $${STAGINGDIR}/include/ime/InputMethod.h \
-    $${STAGINGDIR}/include/ime/VirtualKeyboard.h \
-    $${STAGINGDIR}/include/ime/VirtualKeyboardPreferences.h
+# Add rest of the needed headers after setting $$STAGING_INCLUDE_DIR in platform .pri file
+HEADERS += $${STAGING_INCLUDE_DIR}/ime/IMEData.h \
+    $${STAGING_INCLUDE_DIR}/ime/IMEDataInterface.h \
+    $${STAGING_INCLUDE_DIR}/ime/InputMethod.h \
+    $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboard.h \
+    $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboardPreferences.h
 
 DESTDIR = ../$${BUILD_TYPE}-$${MACHINE_NAME}
 
