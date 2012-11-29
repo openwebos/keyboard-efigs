@@ -54,9 +54,7 @@ SOURCES += ../src/CandidateBar.cpp \
     ../src/JSONUtils.cpp \
     ../src/KeyLocationRecorder.cpp \
     ../src/PalmIMEHelpers.cpp \
-    ../src/ShortcutsHandler.cpp \
-    # TODO: figure out how to get the prefs working for real and then remove the src/ime folder and its contents
-    ../src/ime/VirtualKeyboardPreferences_stub.cpp
+    ../src/ShortcutsHandler.cpp
 
 linux-g++ {
     include(desktop.pri)
@@ -80,8 +78,7 @@ linux-g++ {
 HEADERS += $${STAGING_INCLUDE_DIR}/ime/IMEData.h \
     $${STAGING_INCLUDE_DIR}/ime/IMEDataInterface.h \
     $${STAGING_INCLUDE_DIR}/ime/InputMethod.h \
-    $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboard.h \
-    $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboardPreferences.h
+    $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboard.h
 
 DESTDIR = ../$${BUILD_TYPE}-$${MACHINE_NAME}
 

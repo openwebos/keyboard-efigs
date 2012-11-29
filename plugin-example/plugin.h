@@ -50,7 +50,7 @@ public:
     virtual QString name() const;
 
     virtual VirtualKeyboardFactory::EVirtualKeyboardSupport
-        getSupport(int maxWidth, int maxHeight, int dpi, const char *locale);
+        getSupport(int maxWidth, int maxHeight, int dpi, const std::string locale);
 
 private:
     Plugin *m_plugin;

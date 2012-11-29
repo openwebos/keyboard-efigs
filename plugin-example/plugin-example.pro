@@ -29,9 +29,7 @@ QMAKE_CXXFLAGS += -Wall
 
 HEADERS += plugin.h
 
-SOURCES += plugin.cpp \
-    # TODO: figure out how to get the prefs working for real and then remove the src/ime folder and its contents
-    ../src/ime/VirtualKeyboardPreferences_stub.cpp \
+SOURCES += plugin.cpp
 
 linux-g++|linux-g++-64 {
     STAGINGDIR = $$(LUNA_STAGING)
@@ -53,8 +51,7 @@ INCLUDEPATH += $${STAGINGDIR}/include/ime \
 HEADERS += $${STAGINGDIR}/include/ime/IMEData.h \
     $${STAGINGDIR}/include/ime/IMEDataInterface.h \
     $${STAGINGDIR}/include/ime/InputMethod.h \
-    $${STAGINGDIR}/include/ime/VirtualKeyboard.h \
-    $${STAGINGDIR}/include/ime/VirtualKeyboardPreferences.h
+    $${STAGINGDIR}/include/ime/VirtualKeyboard.h
 
 DESTDIR = build
 OBJECTS_DIR = $$DESTDIR/.obj

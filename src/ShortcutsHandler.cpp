@@ -22,7 +22,6 @@
 #include "ShortcutsHandler.h"
 #include "PalmIMEHelpers.h"
 #include "qchar.h"
-#include <VirtualKeyboardPreferences.h>
 
 const quint64   cMaxDelay = 1000;
 Qt::Key         cUnknownKey = Qt::Key_A;
@@ -37,7 +36,7 @@ ShortcutsHandler::ShortcutsHandler(IMEDataInterface * dataInterface)
 
 void ShortcutsHandler::resetEditor(const PalmIME::EditorState & state)
 {
-    m_enableDoubleSpacePeriod = (state.type == PalmIME::FieldType_Text) && m_IMEDataInterface->virtualKeyboardPreferences().getSpaces2period();
+    m_enableDoubleSpacePeriod = (state.type == PalmIME::FieldType_Text) && m_IMEDataInterface->getSpaces2period();
     resetEditor();
 }
 

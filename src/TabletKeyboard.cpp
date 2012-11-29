@@ -28,7 +28,6 @@
 #include <QtPlugin>
 #include <stdlib.h>
 #include <glib.h>
-#include <VirtualKeyboardPreferences.h>
 
 namespace Tablet_Keyboard {
 /**
@@ -243,7 +242,7 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
 
     // init size
-    m_IMEDataInterface->virtualKeyboardPreferences().applyInitSettings(this);
+    m_IMEDataInterface->applyInitSettings(this);
 }
 
 TabletKeyboard::~TabletKeyboard()
@@ -337,7 +336,7 @@ void TabletKeyboard::showSuggestions(bool show)
         m_candidateBarLayoutOutdated = true;
         syncKeymap();
         keyboardLayoutChanged();
-        m_IMEDataInterface->virtualKeyboardPreferences().activateCombo(); // for language update...
+        m_IMEDataInterface->activateCombo(); // for language update...
     }
 }
 
@@ -660,10 +659,11 @@ void TabletKeyboard::updateTouch(int id, QPointF position)
             //g_debug("Size: %d, height: %d, deltaY: %d, getKeyboardHeight(+1) - currentHeight = %d", size - cKey_Resize_Default, currentHeight, deltaY, getKeyboardHeight(UKey(size + 1)) - currentHeight);
             //g_debug("Size: %d, height: %d, deltaY: %d, getKeyboardHeight(-1) - currentHeight = %d", size - cKey_Resize_Default, currentHeight, deltaY, getKeyboardHeight(UKey(size - 1)) - currentHeight);
 
-            if (UKeyIsKeyboardSizeKey(UKey(size - 1)) && 3 * deltaY <= 2 * (getKeyboardHeight(UKey(size - 1)) - currentHeight)) // going down
-                m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(size - cKey_Resize_Default - 1);
-            else if (UKeyIsKeyboardSizeKey(UKey(size + 1)) && 3 * deltaY >= 2 * (getKeyboardHeight(UKey(size + 1)) - currentHeight)) // going up
-                m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(size - cKey_Resize_Default + 1);
+            if (UKeyIsKeyboardSizeKey(UKey(size - 1)) && 3 * deltaY <= 2 * (getKeyboardHeight(UKey(size - 1)) - currentHeight)) { // going down
+                m_IMEDataInterface->selectKeyboardSize(size - cKey_Resize_Default - 1);
+            } else if (UKeyIsKeyboardSizeKey(UKey(size + 1)) && 3 * deltaY >= 2 * (getKeyboardHeight(UKey(size + 1)) - currentHeight)) { // going up
+                m_IMEDataInterface->selectKeyboardSize(size - cKey_Resize_Default + 1);
+            }
 #endif
         }
         return;
@@ -794,7 +794,7 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
     else if (UKeyIsKeyboardComboKey(key))
     {
         int index = key - cKey_KeyboardComboChoice_First;
-        m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardCombo(index);
+        m_IMEDataInterface->selectKeyboardCombo(index);
     }
     else
     {
@@ -860,13 +860,13 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
             triggerRepaint();
             break;
         case cKey_SwitchToQwerty:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwerty");
+            m_IMEDataInterface->selectLayoutCombo("qwerty");
             break;
         case cKey_SwitchToAzerty:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("azerty");
+            m_IMEDataInterface->selectLayoutCombo("azerty");
             break;
         case cKey_SwitchToQwertz:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwertz");
+            m_IMEDataInterface->selectLayoutCombo("qwertz");
             break;
         case cKey_StartStopRecording:
         {
@@ -879,16 +879,16 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
             break;
         }
         case cKey_ToggleLanguage:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectNextKeyboardCombo();
+            m_IMEDataInterface->selectNextKeyboardCombo();
             break;
         case cKey_CreateDefaultKeyboards:
-            m_IMEDataInterface->virtualKeyboardPreferences().createDefaultKeyboards();
+            m_IMEDataInterface->createDefaultKeyboards();
             break;
         case cKey_ClearDefaultKeyboards:
-            m_IMEDataInterface->virtualKeyboardPreferences().clearDefaultDeyboards();
+            m_IMEDataInterface->clearDefaultDeyboards();
             break;
         case cKey_ToggleSoundFeedback:
-            m_IMEDataInterface->virtualKeyboardPreferences().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+            m_IMEDataInterface->toggleTapSounds();
             break;
         case Qt::Key_Left:
         case Qt::Key_Right:
@@ -918,7 +918,7 @@ void TabletKeyboard::handleKey(UKey key, QPointF where)
         case cKey_Resize_Small:
         case cKey_Resize_Default:
         case cKey_Resize_Large:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardSize(key - cKey_Resize_Default);
+            m_IMEDataInterface->selectKeyboardSize(key - cKey_Resize_Default);
             break;
         default:
             break;
@@ -1665,8 +1665,9 @@ bool TabletKeyboard::setSymbolKeyDown(bool symbolKeyDown)
 
 void TabletKeyboard::makeSound(UKey key)
 {
-    if (m_IMEDataInterface->virtualKeyboardPreferences().getTapSounds() && key != cKey_None)
+    if (m_IMEDataInterface->getTapSounds() && key != cKey_None) {
         m_IMEDataInterface->keyDownAudioFeedback(key);
+    }
 }
 
 void TabletKeyboard::queueIdlePrerendering()

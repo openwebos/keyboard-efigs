@@ -153,7 +153,7 @@ QString PluginFactory::name() const
 
 VirtualKeyboardFactory::EVirtualKeyboardSupport
     PluginFactory::getSupport(int maxWidth, int maxHeight,
-                              int dpi, const char *locale)
+                              int dpi, const std::string locale)
 {
     Q_UNUSED(maxWidth);
     Q_UNUSED(maxHeight);

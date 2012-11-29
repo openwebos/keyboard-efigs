@@ -25,7 +25,6 @@
 #include <QFile>
 #include <qdebug.h>
 #include <pbnjson.hpp>
-#include <VirtualKeyboardPreferences.h>
 
 namespace Phone_Keyboard {
 
@@ -438,8 +437,7 @@ void PhoneKeymap::keyboardCombosChanged()
     IMEDataInterface *iface = getIMEDataInterface();
 
     if (iface) {
-        VirtualKeyboardPreferences &prefs = iface->virtualKeyboardPreferences();
-        int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), prefs.getKeyboardComboCount());
+        int count = qMin<int>(G_N_ELEMENTS(sLanguageChoices_Extended), iface->getKeyboardComboCount());
 
         for (int k = 0; k < count; k++)
             sLanguageChoices_Extended[k] = (UKey) (cKey_KeyboardComboChoice_First + k);
@@ -938,10 +936,9 @@ QString PhoneKeymap::getKeyDisplayString(UKey key, bool logging)
             int index = key - cKey_KeyboardComboChoice_First;
 
             if (iface) {
-                VirtualKeyboardPreferences &prefs = iface->virtualKeyboardPreferences();
-
-                if (index >= 0 && index < prefs.getKeyboardComboCount())
-                    return prefs.getkeyboardCombo(index).language.c_str();
+                if (index >= 0 && index < iface->getKeyboardComboCount()) {
+                    return QString(iface->getLanguageFromKeyboardCombo(index));
+                }
             }
 
             return NULL;
@@ -995,7 +992,7 @@ QString PhoneKeymap::getKeyDisplayString(UKey key, bool logging)
         case cKey_StartStopRecording: return KeyLocationRecorder::instance().isRecording() ? "Stop" : "Rec";
         case cKey_ToggleSoundFeedback:
             if (iface) {
-                return iface->virtualKeyboardPreferences().getTapSounds() ? "Mute" : "Sound";
+                return iface->getTapSounds() ? "Mute" : "Sound";
             } else {
                 return QString();
             }

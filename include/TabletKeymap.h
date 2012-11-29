@@ -28,7 +28,7 @@
 #include <qstring.h>
 
 #include "PalmIMEHelpers.h"
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 
 // Whether the keyboard should have resize handles in the top left & right corners
 #define RESIZE_HANDLES 0

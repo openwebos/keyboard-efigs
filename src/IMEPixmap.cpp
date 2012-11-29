@@ -20,7 +20,7 @@
 
 
 #include "IMEPixmap.h"
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 #include "PalmIMEHelpers.h"
 #include "GlyphCache.h"
 

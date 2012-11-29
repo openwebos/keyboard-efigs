@@ -31,7 +31,6 @@
 #include <glib.h>
 #include <sys/times.h>
 #include <IMEDataInterface.h>
-#include <VirtualKeyboardPreferences.h>
 
 namespace Phone_Keyboard {
 
@@ -236,7 +235,7 @@ PhoneKeyboard::PhoneKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboard
     connect(&m_candidateBar, SIGNAL(resized()), SLOT(candidateBarResized()));
 
     // init size
-    m_IMEDataInterface->virtualKeyboardPreferences().applyInitSettings(this);
+    m_IMEDataInterface->applyInitSettings(this);
 }
 
 PhoneKeyboard::~PhoneKeyboard()
@@ -330,7 +329,7 @@ void PhoneKeyboard::showSuggestions(bool show)
         m_candidateBarLayoutOutdated = true;
         syncKeymap();
         keyboardLayoutChanged();
-        m_IMEDataInterface->virtualKeyboardPreferences().activateCombo(); // for language update...
+        m_IMEDataInterface->activateCombo(); // for language update...
     }
 }
 
@@ -730,7 +729,7 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
     else if (UKeyIsKeyboardComboKey(key))
     {
         int index = key - cKey_KeyboardComboChoice_First;
-        m_IMEDataInterface->virtualKeyboardPreferences().selectKeyboardCombo(index);
+        m_IMEDataInterface->selectKeyboardCombo(index);
     }
     else
     {
@@ -796,13 +795,13 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
             triggerRepaint();
             break;
         case cKey_SwitchToQwerty:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwerty");
+            m_IMEDataInterface->selectLayoutCombo("qwerty");
             break;
         case cKey_SwitchToAzerty:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("azerty");
+            m_IMEDataInterface->selectLayoutCombo("azerty");
             break;
         case cKey_SwitchToQwertz:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectLayoutCombo("qwertz");
+            m_IMEDataInterface->selectLayoutCombo("qwertz");
             break;
         case cKey_StartStopRecording:
         {
@@ -815,16 +814,16 @@ void PhoneKeyboard::handleKey(UKey key, QPointF where)
             break;
         }
         case cKey_ToggleLanguage:
-            m_IMEDataInterface->virtualKeyboardPreferences().selectNextKeyboardCombo();
+            m_IMEDataInterface->selectNextKeyboardCombo();
             break;
         case cKey_CreateDefaultKeyboards:
-            m_IMEDataInterface->virtualKeyboardPreferences().createDefaultKeyboards();
+            m_IMEDataInterface->createDefaultKeyboards();
             break;
         case cKey_ClearDefaultKeyboards:
-            m_IMEDataInterface->virtualKeyboardPreferences().clearDefaultDeyboards();
+            m_IMEDataInterface->clearDefaultDeyboards();
             break;
         case cKey_ToggleSoundFeedback:
-            m_IMEDataInterface->virtualKeyboardPreferences().setTapSounds(!VirtualKeyboardPreferences::instance().getTapSounds());
+            m_IMEDataInterface->toggleTapSounds();
             break;
         case Qt::Key_Left:
             qtkey = Qt::Key_Left; // used to navigate the cursor left
@@ -1624,8 +1623,9 @@ bool PhoneKeyboard::setSymbolKeyDown(bool symbolKeyDown)
 
 void PhoneKeyboard::makeSound(UKey key)
 {
-    if (m_IMEDataInterface->virtualKeyboardPreferences().getTapSounds() && key != cKey_None)
+    if (m_IMEDataInterface->getTapSounds() && key != cKey_None) {
         m_IMEDataInterface->keyDownAudioFeedback(key);
+    }
 }
 
 void PhoneKeyboard::queueIdlePrerendering()

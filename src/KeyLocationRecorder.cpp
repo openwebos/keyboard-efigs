@@ -25,7 +25,7 @@
 #include <QString>
 #include <sys/stat.h>
 
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 #include "PalmIMEHelpers.h"
 
 #if defined(TARGET_DEVICE)

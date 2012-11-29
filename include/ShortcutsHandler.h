@@ -22,7 +22,7 @@
 #ifndef SHORTCUTSHANDLER_H
 #define SHORTCUTSHANDLER_H
 
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 #include <qnamespace.h>
 
 #include <ime/palmimedefines.h>

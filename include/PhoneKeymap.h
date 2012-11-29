@@ -29,7 +29,7 @@
 #include <qlist.h>
 
 #include "PalmIMEHelpers.h"
-#include "IMEDataInterface.h"
+#include <IMEDataInterface.h>
 
 class QFile;
 
