@@ -467,7 +467,7 @@ void TabletKeyboard::setKeyboardHeight(int height, bool notify)
     const QRect & availableSpace = m_IMEDataInterface->m_availableSpace.get();
     int width = availableSpace.width();
     int maxHeight = availableSpace.height() - 28;
-    if (!height <= maxHeight)
+    if (height > maxHeight)
         height = maxHeight;
     if (height > 0)
     {
