@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 # LICENSE@@@
+include(common.pri)
 
 TEMPLATE = subdirs
 SUBDIRS = keyboard-efigs-phone \

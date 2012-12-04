@@ -19,8 +19,10 @@
 CONFIG += debug
 
 debug {
+    QMAKE_MAKEFILE = Makefile.Ubuntu
     BUILD_TYPE = debug
 } else {
+    QMAKE_MAKEFILE = Makefile.Ubuntu.Release
     BUILD_TYPE = release
 }
 
