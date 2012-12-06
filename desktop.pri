@@ -34,6 +34,8 @@ DEFINES += TARGET_DESKTOP
 LIBS += \
     -Wl,-rpath $$(LUNA_STAGING)/lib \
     -L$$(LUNA_STAGING)/lib \
+    -Wl,-rpath $$(LUNA_STAGING)/usr/lib \
+    -L$$(LUNA_STAGING)/usr/lib \
 
 INCLUDEPATH += \
     $$(LUNA_STAGING)/include \
@@ -44,6 +46,7 @@ INCLUDEPATH += \
     $$(LUNA_STAGING)/include/QtOpenGL \
     $$(LUNA_STAGING)/include/QtSql \
     $$(LUNA_STAGING)/include/QtDeclarative \
-    $$(LUNA_STAGING)/include/ime
+    $$(LUNA_STAGING)/include/ime \
+    $$(LUNA_STAGING)/usr/include \
 
 target.path = $$(ROOTFS)/usr/lib/luna
