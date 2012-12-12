@@ -1784,4 +1784,6 @@ bool PhoneKeyboard::idle()
 
 }; // namespace Phone_Keyboard
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 Q_EXPORT_PLUGIN2(keyboard-efigs-phone, Phone_Keyboard::PhoneKeyboardFactory)
+#endif

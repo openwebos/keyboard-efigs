@@ -25,3 +25,7 @@ HEADERS += ../include/PhoneKeyboard.h \
 
 SOURCES += ../src/PhoneKeyboard.cpp \
     ../src/PhoneKeymap.cpp
+
+contains(QT_VERSION, "^5.*") {
+    OTHER_FILES += ../include/keyboard-phone.json
+}

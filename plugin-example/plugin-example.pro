@@ -20,6 +20,9 @@ TARGET = plugin-example
 TEMPLATE = lib
 
 QT += core gui
+contains(QT_VERSION, "^5.*") {
+QT += widgets
+}
 CONFIG += plugin debug
 
 CONFIG += link_pkgconfig
@@ -30,6 +33,10 @@ QMAKE_CXXFLAGS += -Wall
 HEADERS += plugin.h
 
 SOURCES += plugin.cpp
+
+contains(QT_VERSION, "^5.*") {
+    OTHER_FILES += plugin-example.json
+}
 
 linux-g++|linux-g++-64 {
     STAGINGDIR = $$(LUNA_STAGING)

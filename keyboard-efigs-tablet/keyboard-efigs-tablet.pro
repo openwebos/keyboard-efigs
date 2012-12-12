@@ -25,3 +25,7 @@ HEADERS += ../include/TabletKeyboard.h \
 
 SOURCES += ../src/TabletKeyboard.cpp \
     ../src/TabletKeymap.cpp
+
+contains(QT_VERSION, "^5.*") {
+    OTHER_FILES += ../include/keyboard-tablet.json
+}

@@ -1836,4 +1836,6 @@ bool TabletKeyboard::idle()
 
 }; // namespace Tablet_Keyboard
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 Q_EXPORT_PLUGIN2(keyboard-efigs-tablet, Tablet_Keyboard::TabletKeyboardFactory)
+#endif

@@ -24,6 +24,9 @@
 
 #include <qpixmap.h>
 #include <qtimer.h>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtPlugin>
+#endif
 
 #include <map>
 #include <stdint.h>
@@ -289,6 +292,9 @@ class TabletKeyboardFactory : public QObject, public VirtualKeyboardFactory
 {
     Q_OBJECT
     Q_INTERFACES(VirtualKeyboardFactory)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    Q_PLUGIN_METADATA(IID "keyboard-efigs-tablet" FILE "keyboard-tablet.json")
+#endif
 
 public:
     TabletKeyboardFactory();

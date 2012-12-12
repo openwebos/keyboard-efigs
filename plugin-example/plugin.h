@@ -41,6 +41,10 @@ class PluginFactory : public QObject,
     Q_OBJECT
     Q_INTERFACES(VirtualKeyboardFactory)
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    Q_PLUGIN_METADATA(IID "plugin-example" FILE "plugin-example.json")
+#endif
+
 public:
     PluginFactory() : m_plugin(0) {}
     ~PluginFactory() { delete m_plugin; }

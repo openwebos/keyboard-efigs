@@ -25,6 +25,11 @@ INCLUDEPATH += . \
     ../include
 
 QT += core gui
+
+contains(QT_VERSION, "^5.*") {
+    QT += widgets
+}
+
 CONFIG += plugin
 
 CONFIG += link_pkgconfig

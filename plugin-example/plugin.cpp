@@ -182,4 +182,6 @@ VirtualKeyboardFactory::EVirtualKeyboardSupport
     // return VirtualKeyboardFactory::eVirtualKeyboardSupport_Preferred_SizeAndLocale;
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 Q_EXPORT_PLUGIN2(plugin-example, PluginFactory)
+#endif
