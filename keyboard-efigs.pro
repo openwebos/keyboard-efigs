@@ -18,6 +18,9 @@
 include(common.pri)
 
 TEMPLATE = subdirs
+
+CONFIG += ordered
+
 SUBDIRS = keyboard-efigs-phone \
           keyboard-efigs-tablet
 
