@@ -30,6 +30,7 @@
 #include <glib.h>
 
 namespace Tablet_Keyboard {
+
 /**
  * temporary XML filename
  */

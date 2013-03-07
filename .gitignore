@@ -24,8 +24,8 @@
 # build products.
 /BUILD*
 /build*
-/release*
-/debug*
+release-*/
+debug-*/
 
 Makefile*
 *.pro.user

@@ -40,7 +40,7 @@ CONFIG += no_keywords
 
 QMAKE_CXXFLAGS += -fno-rtti -fno-exceptions -fvisibility=hidden -fvisibility-inlines-hidden -Wall
 
-LIBS += -lpbnjson_cpp -llunaservice
+LIBS += -lpbnjson_cpp -lluna-service2
 
 # Input
 HEADERS += ../include/CandidateBar.h \
@@ -61,9 +61,7 @@ SOURCES += ../src/CandidateBar.cpp \
     ../src/PalmIMEHelpers.cpp \
     ../src/ShortcutsHandler.cpp
 
-linux-g++ {
-    include(desktop.pri)
-} else:linux-g++-64 {
+linux-g++* {
     include(desktop.pri)
 } else:linux-qemux86-g++ {
     include(emulator.pri)
@@ -85,10 +83,11 @@ HEADERS += $${STAGING_INCLUDE_DIR}/ime/IMEData.h \
     $${STAGING_INCLUDE_DIR}/ime/InputMethod.h \
     $${STAGING_INCLUDE_DIR}/ime/VirtualKeyboard.h
 
-DESTDIR = ../$${BUILD_TYPE}-$${MACHINE_NAME}
+OBJECTDIR = $${BUILD_TYPE}-$${MACHINE_NAME}
+DESTDIR = ../$${OBJECTDIR}
 
-OBJECTS_DIR = $$DESTDIR/.obj
-MOC_DIR = $$DESTDIR/.moc
+OBJECTS_DIR = $$OBJECTDIR/.obj
+MOC_DIR = $$OBJECTDIR/.moc
 
 QMAKE_DISTCLEAN += -r $${DESTDIR}
 

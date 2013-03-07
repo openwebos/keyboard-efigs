@@ -1,6 +1,6 @@
 /* @@@LICENSE
 *
-*      Copyright (c) 2011-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2011-2013 Hewlett-Packard Development Company, L.P.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@
 #include "JSONUtils.h"
 #include <glib.h>
 #include <IMEDataInterface.h>
+#include <lunaservice.h>
 #include <QDebug>
 
 CandidateBarRemote::CandidateBarRemote(Mapper_IF& mapper, IMEDataInterface * dataInterface) :
-    CandidateBar(mapper, dataInterface), m_shift(false), m_capsLock(false), m_autoCap(false), m_serviceHandle(0)
+    CandidateBar(mapper, dataInterface), m_shift(false), m_capsLock(false), m_autoCap(false)
 {
 }
 
@@ -224,25 +225,21 @@ void CandidateBarRemote::updateSuggestions(bool trace)
     std::string msgStr = jsonToString(msg);
     //g_debug("Sending: %s", msgStr.c_str());
 
-    GMainLoop *loop = m_IMEDataInterface->getMainLoop();
+    LSHandle *serviceHandle = m_IMEDataInterface->getLunaServiceHandle();
 
-    if (loop) {
+    if (serviceHandle) {
         LSError lserror;
         LSErrorInit(&lserror);
 
-        if (m_serviceHandle || (LSRegister(NULL, &m_serviceHandle, &lserror) &&
-            LSGmainAttach(m_serviceHandle, loop, &lserror)))
-        {
-            LSCall(m_serviceHandle, "palm://com.palm.smartKey/processTaps",
+        LSCall(serviceHandle, "palm://com.palm.smartKey/processTaps",
                    msgStr.c_str(), smartkeyReplyHandler, this, NULL, &lserror);
-        }
         if (LSErrorIsSet(&lserror))
         {
             qCritical() << lserror.message << lserror.file << lserror.line << lserror.func;
             LSErrorFree(&lserror);
         }
     } else {
-        qCritical() << Q_FUNC_INFO << "Couldn't get main loop instance! Message sending failed.";
+        qCritical() << Q_FUNC_INFO << "Couldn't get LS2 service handle! Message sending failed.";
     }
 }
 

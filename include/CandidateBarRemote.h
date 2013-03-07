@@ -22,7 +22,6 @@
 #define CANDIDATEBARREMOTE_H
 
 #include "CandidateBar.h"
-#include <lunaservice.h>
 
 class CandidateBarRemote : public CandidateBar
 {
@@ -51,8 +50,6 @@ private:
     bool m_shift;
     bool m_capsLock;
     bool m_autoCap;
-
-    LSHandle *m_serviceHandle;
 };
 
 #endif // CANDIDATEBARREMOTE_H
