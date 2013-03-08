@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 # LICENSE@@@
-#include(common.pri)
+include(common.pri)
 
 TEMPLATE = subdirs
 
