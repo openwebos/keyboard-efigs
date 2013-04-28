@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics, Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -24,7 +25,14 @@
 
 #include <QDebug>
 #include <QFile>
+#if defined (HAS_OPENGL)
+#include <QGuiApplication>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLPaintDevice>
+#include <QtGui/QPainter>
+#else
 #include <QApplication>
+#endif
 #include <QtPlugin>
 #include <stdlib.h>
 #include <glib.h>
@@ -34,7 +42,7 @@ namespace Tablet_Keyboard {
 /**
  * temporary XML filename
  */
-#define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
+#define IME_KDB_XML_FILENAME      "/tmp/webos/kdb.xml"
 
 #define DOUBLE_TAP_DURATION 500
 
@@ -483,9 +491,13 @@ void TabletKeyboard::setKeyboardHeight(int height, bool notify)
         m_keyboardTopPading = height - keymapHeight;
         if (m_keyboardTopPading < 0)
             m_keyboardTopPading = 0;
+#if defined(HAS_OPENGL)
+        // TabletKeymap pushed at the top of the available space
+        m_keymap.setRect(0, 0, width, keymapHeight);
+#else
         // TabletKeymap pushed at the bottom of the available space
         m_keymap.setRect(0, availableSpace.height() - keymapHeight, width, keymapHeight);
-
+#endif
         if (notify)
         {
             keyboardLayoutChanged();
@@ -1213,6 +1225,15 @@ void TabletKeyboard::showKeymapRegions()
 
 void TabletKeyboard::paint(QPainter & painter)
 {
+#if defined(HAS_OPENGL)
+    const QRect & availableSpace = m_IMEDataInterface->m_availableSpace.get();
+    int width = availableSpace.width();
+    int height = 300; // TODO: availableSpace.height();
+    m_keymap.setRect(0, 0, width, height);
+#ifdef TARGET_DESKTOP
+        g_warning("TabletKeyboard::paint: Set size, w=%d, h=%d", width, height);
+#endif
+#endif
     //painter.setClipping(false);
     PerfMonitor perf("TabletKeyboard::paint");
     m_candidateBar.paint(painter, cBlueColor);
@@ -1369,8 +1390,11 @@ bool TabletKeyboard::updateBackground()
         {
             //g_critical("Rebuilding BACKGROUND");
             m_keyboardLimitsVersion = m_keymap.updateLimits();
+#if defined(HAS_OPENGL)
+            m_keyboardBackgound->fill(QColor(cActiveColor_back));
+#else
+            // TODO:  Fix this code to work with OpenGL without crashing on drawPixmap
             QPainter offscreenPainter(m_keyboardBackgound);
-            //m_keyboardBackgound->fill(QColor(255, 0, 0));
             offscreenPainter.drawPixmap(QRect(0, 0, width, usedHeight), m_background.pixmap());
             offscreenPainter.translate(0, -keyboardFrame.top());
             offscreenPainter.setRenderHints(cRenderHints, true);
@@ -1379,6 +1403,7 @@ bool TabletKeyboard::updateBackground()
             int yoffset = 5 - m_9tileCorner.m_trimV;
             offscreenPainter.drawPixmap(keyboardFrame.topLeft() + QPoint(xoffset, yoffset), m_drag_handle);
             offscreenPainter.drawPixmap(keyboardFrame.topRight() + QPoint(-m_drag_handle.width() - xoffset, yoffset), m_drag_handle);
+#endif
 #endif
             m_nineTileSprites.reserve(true);
             for (int y = 0; y < TabletKeymap::cKeymapRows; ++y)
@@ -1414,8 +1439,10 @@ bool TabletKeyboard::updateBackground()
                     {
                         QRect r;
                         int count = m_keymap.keyboardToKeyZone(keyCoord, r);
+#if !defined(HAS_OPENGL)
                         if (count > 0 && key != cKey_None)
                             drawKeyBackground(offscreenPainter, r, keyCoord, key, false, count);
+#endif
                     }
                 }
             }

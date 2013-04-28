@@ -110,6 +110,7 @@ void NineTileSprites::reserve(QSize size, int count, QPixmap & pixmap)
 
 void NineTileSprites::draw(QPainter & painter, const QRect & location, QPixmap & pixmap, bool pressed, int count, const NineTileCorner & corner)
 {
+#if !(HAS_OPENGL)
     int width = location.width();
     int height = location.height();
     int & pos = m_sprites[SpriteRef(pixmap, location.size())];
@@ -126,6 +127,9 @@ void NineTileSprites::draw(QPainter & painter, const QRect & location, QPixmap &
         painter.drawPixmap(location.left(), location.top(), *m_pixmap, pos, (pressed ? height : 0), width, height);
     else
         nineTileDraw(painter, location, pixmap, pressed, corner); // can't cache: draw directly...
+#else
+    nineTileDraw(painter, location, pixmap, pressed, corner); // can't cache: draw directly...
+#endif
 }
 
 #if 0

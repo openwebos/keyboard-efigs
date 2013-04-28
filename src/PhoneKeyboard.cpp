@@ -25,7 +25,15 @@
 
 #include <QDebug>
 #include <QFile>
+#if defined (HAS_OPENGL)
+#include <QGuiApplication>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLPaintDevice>
+#include <QtGui/QPainter>
+// TODO:  Complete changes for OpenGL support
+#else
 #include <QApplication>
+#endif
 #include <QtPlugin>
 #include <stdlib.h>
 #include <glib.h>
@@ -37,7 +45,7 @@ namespace Phone_Keyboard {
 /**
  * temporary XML filename
  */
-#define IME_KDB_XML_FILENAME      "/tmp/kdb.xml"
+#define IME_KDB_XML_FILENAME      "/tmp/webos/kdb.xml"
 
 #define DOUBLE_TAP_DURATION 500
 
