@@ -1257,7 +1257,9 @@ void TabletKeyboard::paint(QPainter & painter)
             int count = m_keymap.keyboardToKeyZone(keyCoord, r);
             if (count > 0 && key != cKey_None)
             {
+            #if !defined(HAS_OPENGL)
                 if (key == Qt::Key_Shift)
+            #endif
                     drawKeyBackground(painter, r, keyCoord, key, false, count);
                 drawKeyCap(&painter, renderer, r, keyCoord, key, false);
             }
