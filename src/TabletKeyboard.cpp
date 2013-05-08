@@ -74,6 +74,7 @@ const int cPopupSide = 20;
 const int cPopupPointerStart = 37;
 const int cPopupPointerWidth = 25;
 const int cPopupTopToKey = 10;
+const int cPopupTopToKeyUnder = 14;
 const int cPopupSingleLineMax = 5; // if more extended chars that this, break-up in two lines
 
 static QFont sFont("Prelude");
@@ -191,20 +192,20 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     m_shift_on("icon-shift-on.png"),
     m_shift_lock("icon-shift-lock.png"),
     m_hide("icon-hide-keyboard.png"),
-    m_emoticon_frown("/usr/palm/emoticons-1.5x/emoticon-frown.png"),
-    m_emoticon_cry("/usr/palm/emoticons-1.5x/emoticon-cry.png"),
-    m_emoticon_smile("/usr/palm/emoticons-1.5x/emoticon-smile.png"),
-    m_emoticon_wink("/usr/palm/emoticons-1.5x/emoticon-wink.png"),
-    m_emoticon_yuck("/usr/palm/emoticons-1.5x/emoticon-yuck.png"),
-    m_emoticon_gasp("/usr/palm/emoticons-1.5x/emoticon-gasp.png"),
-    m_emoticon_heart("/usr/palm/emoticons-1.5x/emoticon-heart.png"),
-    m_emoticon_frown_small("/usr/palm/emoticons/emoticon-frown.png"),
-    m_emoticon_cry_small("/usr/palm/emoticons/emoticon-cry.png"),
-    m_emoticon_smile_small("/usr/palm/emoticons/emoticon-smile.png"),
-    m_emoticon_wink_small("/usr/palm/emoticons/emoticon-wink.png"),
-    m_emoticon_yuck_small("/usr/palm/emoticons/emoticon-yuck.png"),
-    m_emoticon_gasp_small("/usr/palm/emoticons/emoticon-gasp.png"),
-    m_emoticon_heart_small("/usr/palm/emoticons/emoticon-heart.png"),
+    m_emoticon_frown("%s/emoticons-1.5x/emoticon-frown.png"),
+    m_emoticon_cry("%s/emoticons-1.5x/emoticon-cry.png"),
+    m_emoticon_smile("%s/emoticons-1.5x/emoticon-smile.png"),
+    m_emoticon_wink("%s/emoticons-1.5x/emoticon-wink.png"),
+    m_emoticon_yuck("%s/emoticons-1.5x/emoticon-yuck.png"),
+    m_emoticon_gasp("%s/emoticons-1.5x/emoticon-gasp.png"),
+    m_emoticon_heart("%s/emoticons-1.5x/emoticon-heart.png"),
+    m_emoticon_frown_small("%s/emoticons/emoticon-frown.png"),
+    m_emoticon_cry_small("%s/emoticons/emoticon-cry.png"),
+    m_emoticon_smile_small("%s/emoticons/emoticon-smile.png"),
+    m_emoticon_wink_small("%s/emoticons/emoticon-wink.png"),
+    m_emoticon_yuck_small("%s/emoticons/emoticon-yuck.png"),
+    m_emoticon_gasp_small("%s/emoticons/emoticon-gasp.png"),
+    m_emoticon_heart_small("%s/emoticons/emoticon-heart.png"),
     m_background("keyboard-bg.png"),
     m_drag_handle("drag-handle.png"),
     m_drag_highlight("drag-highlight.png"),
@@ -216,7 +217,10 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     m_shift_lock_key("key-shift-lock.png"),
     m_popup("popup-bg.png"),
     m_popup_2("popup-bg-2.png"),
+    m_popup_v("popup-bg-v.png"),
     m_popup_key("popup-key.png"),
+    m_pop_under (false),
+    m_wideAspect (false),
     m_glyphCache(440, 800)
 {
     if (s_instance == NULL)
@@ -553,6 +557,7 @@ void TabletKeyboard::clearExtendedkeys()
     }
     else if (!m_IMEDataInterface->m_hitRegion.get().isEmpty())
         m_IMEDataInterface->m_hitRegion.set(QRegion());  // defensive...
+    m_pop_under = false;
     triggerRepaint();
 }
 
@@ -1130,6 +1135,7 @@ void TabletKeyboard::repeatChar()
 bool TabletKeyboard::setExtendedKeys(QPoint keyCoord, bool cancelIfSame)
 {
     const UKey * newExtended = m_keymap.getExtendedChars(keyCoord);
+
     if (cancelIfSame && newExtended == m_extendedKeys)
         return false;
     m_extendedKeys = newExtended;
@@ -1137,11 +1143,15 @@ bool TabletKeyboard::setExtendedKeys(QPoint keyCoord, bool cancelIfSame)
     {
         int cellCount, lineCount, lineLength;
         getExtendedPopupSpec(cellCount, lineCount, lineLength);
-        IMEPixmap & popup = (lineCount > 1) ? m_popup_2 : m_popup;
         m_extendedKeyShown = cKey_None;
         m_keymap.keyboardToKeyZone(keyCoord, m_extendedKeysFrame);
+#if defined(HAS_OPENGL)
+        m_pop_under = (keyCoord.y() < 2);  // for top two rows of keys, display extend keys pop-up underneath the row
+#endif
+        IMEPixmap & popup = (lineCount > 1) ? m_popup_2 : (m_pop_under ? m_popup_v : m_popup);
         m_extendedKeysPointer = m_extendedKeysFrame.left() + m_extendedKeysFrame.width() / 2;
-        m_extendedKeysFrame.translate(0, -popup.height() + 10);
+        if (!m_pop_under) m_extendedKeysFrame.translate(0, -popup.height() + 10);
+        else m_extendedKeysFrame.translate(0, m_extendedKeysFrame.height());
         int width = cPopupLeftSide + cPopupRightSide + lineLength * m_popup_key.width();
         m_extendedKeysFrame.setLeft(m_extendedKeysPointer - m_popup_key.width() / 2 - cPopupLeftSide);
         m_extendedKeysFrame.setWidth(width);
@@ -1167,7 +1177,8 @@ bool TabletKeyboard::pointToExtendedPopup(QPointF position, UKey & outKey)
     outKey = cKey_None;
     if (m_extendedKeys && m_extendedKeysFrame.contains(position.x(), position.y() + m_keymap.rect().top()))
     {
-        QPoint where = position.toPoint() - m_extendedKeysFrame.topLeft() - QPoint(cPopupLeftSide, -m_keymap.rect().top() + cPopupTopToKey);
+        int adjTop = (m_pop_under ? cPopupTopToKeyUnder : cPopupTopToKey);
+        QPoint where = position.toPoint() - m_extendedKeysFrame.topLeft() - QPoint(cPopupLeftSide, -m_keymap.rect().top() + adjTop);
         int cellCount, lineCount, lineLength;
         getExtendedPopupSpec(cellCount, lineCount, lineLength);
         int x = qMin<int>(where.x() / m_popup_key.width(), lineLength - 1);
@@ -1186,7 +1197,13 @@ void TabletKeyboard::getExtendedPopupSpec(int & outCellCount, int & outLineCount
     if (m_extendedKeys)
         while (m_extendedKeys[outCellCount] != cKey_None)
             ++outCellCount;
-    outLineCount = (outCellCount > cPopupSingleLineMax) ? 2 : 1;
+#if defined(HAS_OPENGL)
+    const QRect & availableSpace = m_IMEDataInterface->m_availableSpace.get();
+    int width = availableSpace.width();
+    if (width > 1024) outLineCount = 1; // set to 1 line for "wide" screens
+    else
+#endif
+        outLineCount = (outCellCount > cPopupSingleLineMax) ? 2 : 1;
     outLineLength = (outCellCount + outLineCount - 1) / outLineCount;
 }
 
@@ -1230,6 +1247,7 @@ void TabletKeyboard::paint(QPainter & painter)
     int width = availableSpace.width();
     int height = 300; // TODO: availableSpace.height();
     m_keymap.setRect(0, 0, width, height);
+    m_wideAspect = true;
 #ifdef TARGET_DESKTOP
         g_warning("TabletKeyboard::paint: Set size, w=%d, h=%d", width, height);
 #endif
@@ -1257,9 +1275,7 @@ void TabletKeyboard::paint(QPainter & painter)
             int count = m_keymap.keyboardToKeyZone(keyCoord, r);
             if (count > 0 && key != cKey_None)
             {
-            #if !defined(HAS_OPENGL)
                 if (key == Qt::Key_Shift)
-            #endif
                     drawKeyBackground(painter, r, keyCoord, key, false, count);
                 drawKeyCap(&painter, renderer, r, keyCoord, key, false);
             }
@@ -1313,7 +1329,7 @@ void TabletKeyboard::paint(QPainter & painter)
         renderer.flush();
         int cellCount, lineCount, lineLength;
         getExtendedPopupSpec(cellCount, lineCount, lineLength);
-        IMEPixmap & popup = (lineCount > 1) ? m_popup_2 : m_popup;
+        IMEPixmap & popup = (lineCount > 1) ? m_popup_2 : (m_pop_under ? m_popup_v : m_popup);
         QRect r(m_extendedKeysFrame);
         int left = r.left() + cPopupSide;
         int right = r.right() - cPopupSide + 1;
@@ -1327,7 +1343,8 @@ void TabletKeyboard::paint(QPainter & painter)
         if (pointerRight < right)
             painter.drawPixmap(pointerRight, r.top(), right - pointerRight, popup.height(), popup.pixmap(), cPopupSide, 0, 1, popup.height());
         painter.drawPixmap(pointerLeft, r.top(), popup.pixmap(), cPopupPointerStart, 0, cPopupPointerWidth, popup.height());
-        r.translate(cPopupLeftSide, cPopupTopToKey);
+        int adjTop = (m_pop_under ? cPopupTopToKeyUnder : cPopupTopToKey);
+        r.translate(cPopupLeftSide, adjTop);
         UKey key;
         for (int k = 0; (key = m_extendedKeys[k]) != cKey_None; ++k)
         {
@@ -1356,9 +1373,15 @@ void TabletKeyboard::paint(QPainter & painter)
             }
             if (UKeyIsKeyboardSizeKey(key) && m_requestedHeight == getKeyboardHeight(key))
             {
-                sFont.setBold(true);   painter.setFont(sFont);
+                if (m_wideAspect) {
+                    sFont.setWeight(QFont::Black);
+                    sFont.setStretch(QFont::ExtraExpanded);
+                }
+                else sFont.setBold(true);
+                painter.setFont(sFont);
                 doubleDrawRenderer.renderNow(painter, cell, GlyphSpec(text, fontSize, true, cBlueColor, cBlueColor_back)); // don't ever cache, because of color exception!
-                sFont.setBold(false);   painter.setFont(sFont);
+                sFont.setBold(false);   sFont.setStretch(QFont::Unstretched);
+                painter.setFont(sFont);
             }
             else
                 renderer.render(cell, GlyphSpec(text, fontSize, false, cActiveColor, cActiveColor_back), sFont);
@@ -1392,12 +1415,13 @@ bool TabletKeyboard::updateBackground()
         {
             //g_critical("Rebuilding BACKGROUND");
             m_keyboardLimitsVersion = m_keymap.updateLimits();
+            QPainter offscreenPainter(m_keyboardBackgound);
 #if defined(HAS_OPENGL)
-            m_keyboardBackgound->fill(QColor(cActiveColor_back));
+            offscreenPainter.fillRect (QRect(0, 0, width, usedHeight), QColor(cActiveColor_back));
 #else
             // TODO:  Fix this code to work with OpenGL without crashing on drawPixmap
-            QPainter offscreenPainter(m_keyboardBackgound);
             offscreenPainter.drawPixmap(QRect(0, 0, width, usedHeight), m_background.pixmap());
+#endif
             offscreenPainter.translate(0, -keyboardFrame.top());
             offscreenPainter.setRenderHints(cRenderHints, true);
 #if RESIZE_HANDLES
@@ -1405,7 +1429,6 @@ bool TabletKeyboard::updateBackground()
             int yoffset = 5 - m_9tileCorner.m_trimV;
             offscreenPainter.drawPixmap(keyboardFrame.topLeft() + QPoint(xoffset, yoffset), m_drag_handle);
             offscreenPainter.drawPixmap(keyboardFrame.topRight() + QPoint(-m_drag_handle.width() - xoffset, yoffset), m_drag_handle);
-#endif
 #endif
             m_nineTileSprites.reserve(true);
             for (int y = 0; y < TabletKeymap::cKeymapRows; ++y)
@@ -1441,10 +1464,8 @@ bool TabletKeyboard::updateBackground()
                     {
                         QRect r;
                         int count = m_keymap.keyboardToKeyZone(keyCoord, r);
-#if !defined(HAS_OPENGL)
                         if (count > 0 && key != cKey_None)
                             drawKeyBackground(offscreenPainter, r, keyCoord, key, false, count);
-#endif
                     }
                 }
             }
@@ -1602,7 +1623,13 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
             fontSize = (height + 1) / 2;
         if (text.size() > 1)
         {
-            sFont.setBold(UKeyIsFunctionKey(key) && !UKeyIsTextShortcutKey(key));
+            if (m_wideAspect && UKeyIsFunctionKey(key) && !UKeyIsTextShortcutKey(key)) {
+                sFont.setBold(true);
+                sFont.setWeight(QFont::Black);
+                sFont.setStretch(QFont::ExtraExpanded);
+            }
+            else
+                sFont.setBold(UKeyIsFunctionKey(key) && !UKeyIsTextShortcutKey(key));
             fontSize = qMin<int>(fontSize, 22);
             sFont.setPixelSize(fontSize);
             int gap;
@@ -1619,6 +1646,13 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
                 forceAlignHCenter = true;
             //g_debug("Using font size %d, Width = %d, text width = %d", fontSize, location.width(), QFontMetrics(sFont).width(text));
         }
+        else {
+            if (m_wideAspect) {
+                sFont.setBold(true);
+                sFont.setWeight(QFont::Black);
+                sFont.setStretch(QFont::ExtraExpanded);
+            }
+        }
         if (twoHorizontal)
         {
             if (mainCharColor == cActiveColor)
@@ -1628,17 +1662,17 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
             if (inLandscapeOrientation() == false)
                 fontSize -= 1;
             QRect rect(location.left() + location.width() / 2 - centerOffset, location.top(), location.width() / 2, location.height());
-            renderer.render(rect, GlyphSpec(text, font_size(text, mainCharColor, fontSize, 75), sFont.bold(), mainCharColor, mainCharColor_back), sFont);
+            renderer.render(rect, GlyphSpec(text, font_size(text, mainCharColor, fontSize, 75), (m_wideAspect ? true : sFont.bold()), mainCharColor, mainCharColor_back), sFont);
             rect.moveLeft(location.left() + centerOffset);
-            renderer.render(rect, GlyphSpec(altText, font_size(altText, altCharColor, fontSize, 75), sFont.bold(), altCharColor, altCharColor_back), sFont);
+            renderer.render(rect, GlyphSpec(altText, font_size(altText, altCharColor, fontSize, 75), (m_wideAspect ? true : sFont.bold()), altCharColor, altCharColor_back), sFont);
         }
         else if (twoVertical)
         {
             int boxheight = location.height() / 3;
             QRect rect(location.left(), location.bottom() - boxheight - 10 + (boostSize(text) ? -2 : 0), location.width(), boxheight);
-            renderer.render(rect, GlyphSpec(text, font_size(text, mainCharColor, fontSize, 75), sFont.bold(), mainCharColor, mainCharColor_back), sFont);
+            renderer.render(rect, GlyphSpec(text, font_size(text, mainCharColor, fontSize, 75), (m_wideAspect ? true : sFont.bold()), mainCharColor, mainCharColor_back), sFont);
             rect.moveTop(location.top() + 10);
-            renderer.render(rect, GlyphSpec(altText, font_size(altText, altCharColor, fontSize, 75), sFont.bold(), altCharColor, altCharColor_back), sFont);
+            renderer.render(rect, GlyphSpec(altText, font_size(altText, altCharColor, fontSize, 75), (m_wideAspect ? true : sFont.bold()), altCharColor, altCharColor_back), sFont);
         }
         else
         {
@@ -1646,28 +1680,29 @@ void TabletKeyboard::drawKeyCap(QPainter * painter, GlyphRenderer<GlyphSpec> & r
             { // Smaller, bottom right corner...
                 location.setHeight(height * 80 / 100 + m_9tileCorner.m_trimV);
                 if (forceAlignHCenter)
-                    renderer.render(location, GlyphSpec(text, qMin<int>(height, fontSize - 2), sFont.bold(), cFunctionColor, cFunctionColor_back), sFont, Qt::AlignBottom | Qt::AlignHCenter);
+                    renderer.render(location, GlyphSpec(text, qMin<int>(height, fontSize - 2), (m_wideAspect ? true : sFont.bold()), cFunctionColor, cFunctionColor_back), sFont, Qt::AlignBottom | Qt::AlignHCenter);
                 else
                 {
                     location.setWidth(location.width() * 85 / 100 + m_9tileCorner.m_trimH);
-                    renderer.render(location, GlyphSpec(text, qMin<int>(height, fontSize - 2), sFont.bold(), cFunctionColor, cFunctionColor_back), sFont, Qt::AlignBottom | Qt::AlignRight);
+                    renderer.render(location, GlyphSpec(text, qMin<int>(height, fontSize - 2), (m_wideAspect ? true : sFont.bold()), cFunctionColor, cFunctionColor_back), sFont, Qt::AlignBottom | Qt::AlignRight);
                 }
             }
             else
             {
                 int size = qMin<int>(height, fontSize);
                 if (keyCoord.y() == 0)
-                    renderer.render(location, GlyphSpec(text, size, sFont.bold(), cActiveColor, cActiveColor_back), sFont);
+                    renderer.render(location, GlyphSpec(text, size, (m_wideAspect ? true : sFont.bold()), cActiveColor, cActiveColor_back), sFont);
                 else if (key == Qt::Key_Space)
                 {
                     if (painter)
-                        renderer.renderNow(location, GlyphSpec(text, size, sFont.bold(), selectFromKeyType<QColor>(key, cActiveColor, cFunctionColor, cActiveColor), selectFromKeyType<QColor>(key, cActiveColor_back, cFunctionColor_back, cActiveColor_back)), sFont);
+                        renderer.renderNow(location, GlyphSpec(text, size, (m_wideAspect ? true : sFont.bold()), selectFromKeyType<QColor>(key, cActiveColor, cFunctionColor, cActiveColor), selectFromKeyType<QColor>(key, cActiveColor_back, cFunctionColor_back, cActiveColor_back)), sFont);
                 }
                 else
-                    renderer.render(location, GlyphSpec(text, size, sFont.bold(), selectFromKeyType<QColor>(key, cActiveColor, cFunctionColor, cActiveColor), selectFromKeyType<QColor>(key, cActiveColor_back, cFunctionColor_back, cActiveColor_back)), sFont);
+                    renderer.render(location, GlyphSpec(text, size, (m_wideAspect ? true : sFont.bold()), selectFromKeyType<QColor>(key, cActiveColor, cFunctionColor, cActiveColor), selectFromKeyType<QColor>(key, cActiveColor_back, cFunctionColor_back, cActiveColor_back)), sFont);
             }
         }
         sFont.setBold(false);
+        sFont.setStretch(QFont::Unstretched);
     }
 }
 

@@ -84,7 +84,18 @@ struct GlyphSpec {
     void applyFontSettings(QFont & font) const
     {
         font.setPixelSize(m_fontSize);
+#if defined (HAS_OPENGL)
+    if (m_bold) {
+        font.setWeight(QFont::Black);
+        font.setStretch(QFont::ExtraExpanded);
+    }
+    else {
         font.setBold(m_bold);
+        font.setStretch(QFont::Unstretched);
+    }
+#else
+        font.setBold(m_bold);
+#endif
     }
 
     QString description() const
@@ -282,7 +293,11 @@ private:
     // popup assets.
     IMEPixmap m_popup;
     IMEPixmap m_popup_2;
+    IMEPixmap m_popup_v;
     IMEPixmap m_popup_key;
+
+    bool m_pop_under;
+    bool m_wideAspect;
 
     NineTileSprites m_nineTileSprites;
     GlyphCache<GlyphSpec> m_glyphCache;

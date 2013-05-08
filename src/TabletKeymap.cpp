@@ -760,7 +760,6 @@ int TabletKeymap::keyboardToKeyZone(QPoint keyboardCoordinate, QRect & outZone)
 
         int bottom = m_rect.top() + m_vlimits[y] - 1;
         int top = m_rect.top() + (y > 0 ? m_vlimits[y - 1] : 0);
-
         outZone.setCoords(left, top, right, bottom);
 
         if (right > left)

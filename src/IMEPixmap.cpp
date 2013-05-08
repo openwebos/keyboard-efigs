@@ -33,11 +33,20 @@
 std::vector<IMEPixmap*> IMEPixmap::s_PalmPixmaps;
 
 const char * IMEPixmap::s_defaultLocation = NULL;
+#if defined (HAS_OPENGL)
+const char * IMEPixmap::s_imagesPath = "/usr/palm/images/";
+#else
+const char * IMEPixmap::s_imagesPath = "/usr/palm/";
+#endif
 
 QPixmap &IMEPixmap::pixmap()
 {
     if (m_pixmap.isNull()) {
-        if (*m_name == '/') {
+        if (*m_name == '%' && m_name[1] == 's') {
+            QString filename = s_imagesPath;
+            filename += (m_name + 2);
+            m_pixmap.load(filename);
+        } else if (*m_name == '/') {
             m_pixmap.load(m_name);
         } else {
             IMEDataInterface *iface = getIMEDataInterface();
@@ -110,7 +119,6 @@ void NineTileSprites::reserve(QSize size, int count, QPixmap & pixmap)
 
 void NineTileSprites::draw(QPainter & painter, const QRect & location, QPixmap & pixmap, bool pressed, int count, const NineTileCorner & corner)
 {
-#if !(HAS_OPENGL)
     int width = location.width();
     int height = location.height();
     int & pos = m_sprites[SpriteRef(pixmap, location.size())];
@@ -127,9 +135,6 @@ void NineTileSprites::draw(QPainter & painter, const QRect & location, QPixmap &
         painter.drawPixmap(location.left(), location.top(), *m_pixmap, pos, (pressed ? height : 0), width, height);
     else
         nineTileDraw(painter, location, pixmap, pressed, corner); // can't cache: draw directly...
-#else
-    nineTileDraw(painter, location, pixmap, pressed, corner); // can't cache: draw directly...
-#endif
 }
 
 #if 0

@@ -187,6 +187,7 @@ public:
 
     void render(const QRect & location, const T & textSpec, QFont & font, int flags = Qt::AlignCenter)
     {
+#if !defined (HAS_OPENGL)
 #if VKB_ENABLE_GLYPH_CACHE
         QRect * ref = GlyphRenderer<T>::m_glyphCache.lookup(textSpec);
         if (ref && ref->isValid())
@@ -211,6 +212,7 @@ public:
         ++m_cacheMissCount;
 #ifdef TARGET_DESKTOP
         g_warning("CachedGlyphRenderer::render: direct rendering of %s, size=%d, bold=%d...", textSpec.description().toUtf8().data(), font.pixelSize(), int(font.bold()));
+#endif
 #endif
 #endif
         // last resort: direct draw on screen...

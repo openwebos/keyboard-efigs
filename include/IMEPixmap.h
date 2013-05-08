@@ -59,6 +59,7 @@ private:
     const char *m_name;
 
     static const char *s_defaultLocation;
+    static const char *s_imagesPath;
 
     static std::vector<IMEPixmap*> s_PalmPixmaps;
 };
