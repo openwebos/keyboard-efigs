@@ -650,6 +650,9 @@ void TabletKeyboard::updateTouch(int id, QPointF position)
         touch.m_firstPosition = touchPosition;
         touch.m_lastPosition = touchPosition;
         touch.m_inCandidateBar = inCandidatebar;
+#if defined(HAS_OPENGL)
+        touch.m_keyCoordinate = keyCoordinate;
+#endif
     }
     if (m_resizeMode)
     {
@@ -1416,12 +1419,7 @@ bool TabletKeyboard::updateBackground()
             //g_critical("Rebuilding BACKGROUND");
             m_keyboardLimitsVersion = m_keymap.updateLimits();
             QPainter offscreenPainter(m_keyboardBackgound);
-#if defined(HAS_OPENGL)
-            offscreenPainter.fillRect (QRect(0, 0, width, usedHeight), QColor(cActiveColor_back));
-#else
-            // TODO:  Fix this code to work with OpenGL without crashing on drawPixmap
             offscreenPainter.drawPixmap(QRect(0, 0, width, usedHeight), m_background.pixmap());
-#endif
             offscreenPainter.translate(0, -keyboardFrame.top());
             offscreenPainter.setRenderHints(cRenderHints, true);
 #if RESIZE_HANDLES
