@@ -185,7 +185,11 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     m_extendedKeys(NULL),
     m_extendedKeyShown(cKey_None),
     m_shortcutsHandler(dataInterface),
+#if defined(HAS_OPENGL)
+    m_diamondOptimization(false),
+#else
     m_diamondOptimization(true),
+#endif
     m_idleInit(false),
     m_backspace("icon-delete.png"),
     m_shift("icon-shift.png"),
