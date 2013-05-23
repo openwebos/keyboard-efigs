@@ -1407,7 +1407,7 @@ void TabletKeyboard::paint(QPainter & painter)
 #endif
 #if VKB_FORCE_FPS
     triggerRepaint();
-    paint();
+    repaint();
 #endif
     if (renderer.getCacheMissCount() > 0 && (!m_glyphCache.isFull() || m_keymap.getCachedGlyphsCount() < 3))
         queueIdlePrerendering();

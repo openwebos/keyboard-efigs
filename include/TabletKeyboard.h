@@ -164,8 +164,8 @@ public Q_SLOTS:
     void autoCapChanged(const bool & autoCap);
 
     // slots for candidate bar
-    void triggerRepaint() { m_IMEDataInterface->invalidateRect(m_keymap.rect()); }
-    void candidateBarResized() { m_repaintRequired = true; }
+    void triggerRepaint() { m_repaintRequired = true; }
+    void candidateBarResized() { availableSpaceChanged(m_IMEDataInterface->m_availableSpace.get()); }
 
 public:
     virtual void touchEvent(const QTouchEvent& te);
