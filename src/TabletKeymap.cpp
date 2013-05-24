@@ -1,6 +1,7 @@
 /* @@@LICENSE
 *
 *      Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+*      Copyright (c) 2013 LG Electronics, Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -724,13 +725,6 @@ bool TabletKeymap::setEditorState(const PalmIME::EditorState & editorState)
         layoutChanged = true;
     }
 
-    if (m_dataif) {
-        m_localized__Enter    = m_dataif->getLocalizedString("Enter");
-        m_localized__Tab      = m_dataif->getLocalizedString("Tab");
-        m_localized__Next     = m_dataif->getLocalizedString("Next");
-        m_localized__Previous = m_dataif->getLocalizedString("Prev");
-    }
-
     return layoutChanged || weightChanged;
 }
 
@@ -1025,6 +1019,16 @@ std::string TabletKeymap::pointToKeys(const QPoint & location)
 void TabletKeymap::setIMEDataInterface(IMEDataInterface *dataif)
 {
     m_dataif = dataif;
+
+    // update localizations
+    if (m_dataif) {
+        m_localized__Enter    = m_dataif->getLocalizedString("Enter");
+        m_localized__Tab      = m_dataif->getLocalizedString("Tab");
+        m_localized__Next     = m_dataif->getLocalizedString("Next");
+        m_localized__Previous = m_dataif->getLocalizedString("Prev");
+    } else {
+        m_localized__Enter = m_localized__Tab = m_localized__Next = m_localized__Previous = QString();
+    }
 }
 
 bool TabletKeymap::generateKeyboardLayout(const char * fullPath)

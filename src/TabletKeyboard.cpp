@@ -225,7 +225,8 @@ TabletKeyboard::TabletKeyboard(IMEDataInterface * dataInterface) : VirtualKeyboa
     m_popup_key("popup-key.png"),
     m_pop_under (false),
     m_wideAspect (false),
-    m_glyphCache(440, 800)
+    m_glyphCache(440, 800),
+    m_repaintRequired(false)
 {
     if (s_instance == NULL)
         s_instance = this;
@@ -424,6 +425,14 @@ int TabletKeyboard::getKeyboardHeight(UKey ukey)
     return m_presetHeight[ukey - cKey_Resize_First];
 }
 
+void TabletKeyboard::repaint()
+{
+    if (m_repaintRequired) {
+        m_repaintRequired = false;
+        m_IMEDataInterface->invalidateRect(m_keymap.rect());
+    }
+}
+
 void TabletKeyboard::requestSize(int size)
 {
     requestHeight(getKeyboardHeight(UKey(cKey_Resize_Default + size)));
@@ -556,8 +565,6 @@ void TabletKeyboard::clearExtendedkeys()
     {
         m_extendedKeys = 0;
         m_IMEDataInterface->m_hitRegion.set(QRegion());
-        if (m_IMEDataInterface->m_visible.get())
-            triggerRepaint();
     }
     else if (!m_IMEDataInterface->m_hitRegion.get().isEmpty())
         m_IMEDataInterface->m_hitRegion.set(QRegion());  // defensive...
@@ -583,8 +590,6 @@ void TabletKeyboard::releaseTouch(int id)
             key = m_keymap.map(touch.m_keyCoordinate);
             if (key == Qt::Key_Shift || key == cKey_Symbol)
                 handleKey(key, touch.m_lastPosition);
-            else if (!setExtendedKeys(touch.m_keyCoordinate, true) && !touch.m_consumed)
-                clearExtendedkeys();
             else
                 triggerRepaint();
         }
@@ -595,8 +600,8 @@ void TabletKeyboard::releaseTouch(int id)
                 g_debug("Extended character selected: %s", QString(m_keymap.getKeyDisplayString(key, true)).toUtf8().data());
                 handleKey(key, QPointF());
             }
-            clearExtendedkeys();
         }
+        clearExtendedkeys();
     }
     else if (touch.m_inCandidateBar)
     {
@@ -1086,6 +1091,7 @@ void TabletKeyboard::touchEvent(const QTouchEvent& te)
             setSymbolKeyDown(false);
         }
     }
+    repaint();
 }
 
 void TabletKeyboard::tapEvent(const QPoint& tapPt)
@@ -1172,6 +1178,7 @@ bool TabletKeyboard::setExtendedKeys(QPoint keyCoord, bool cancelIfSame)
             m_IMEDataInterface->m_hitRegion.set(QRegion(m_IMEDataInterface->m_availableSpace.get()));
             triggerRepaint();
         }
+        repaint();
         return true;
     }
     else
@@ -1400,6 +1407,7 @@ void TabletKeyboard::paint(QPainter & painter)
 #endif
 #if VKB_FORCE_FPS
     triggerRepaint();
+    paint();
 #endif
     if (renderer.getCacheMissCount() > 0 && (!m_glyphCache.isFull() || m_keymap.getCachedGlyphsCount() < 3))
         queueIdlePrerendering();
