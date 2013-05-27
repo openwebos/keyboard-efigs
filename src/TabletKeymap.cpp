@@ -930,6 +930,11 @@ QPoint TabletKeymap::pointToKeyboard(const QPoint & location, bool useDiamondOpt
                     }
                 }
             }
+#if defined(HAS_OPENGL)
+            // ignore 'invisible' keys (q, backspace, a, ampersand)
+            if (wkey.m_weight < 0.0f)
+                return cOutside;
+#endif
             if (!changed && wkey.m_weight < 0)
             { // "invisible" key. Look for the visible neighbor that has the same key...
                 for (int xo = (x == 0) ? 0 : x - 1; xo <= x + 1 && xo < cKeymapColumns; ++xo)
