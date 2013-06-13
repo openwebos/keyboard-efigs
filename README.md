@@ -43,7 +43,7 @@ buildable.
 All content, including all source code files and documentation files in this
 repository except otherwise noted are:
 
- Copyright (c) 2010-2012 Hewlett-Packard Development Company, L.P.
+ Copyright (c) 2010-2013 LG Electronics, Inc.
 
 All content, including all source code files and documentation files in this
 repository except otherwise noted are:
